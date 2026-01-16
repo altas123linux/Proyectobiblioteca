@@ -71,7 +71,7 @@ public class Libro{
     public int getAño(){
         return año;
     }
-    public void setAnio(int año){
+    public void setAño(int año){
         this.año = año;
     }
     

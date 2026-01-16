@@ -7,7 +7,7 @@ public abstract class Persona {
     protected String nombre;
     protected String apellido;
     protected String mail;
-    protected String dirrecion;
+    protected String direccion;
     
     public Persona(){
     } //constructor vacio para unir con la base de datos
@@ -17,7 +17,7 @@ public abstract class Persona {
         this.nombre = nombre;
         this.apellido = apellido;
         this.mail = mail;
-        this.dirrecion = dirrecion; //Constructor con parametros para prueba
+        this.direccion = dirrecion; //Constructor con parametros para prueba
     }
     
     public int getIdPersona() {
@@ -56,11 +56,11 @@ public abstract class Persona {
     }
     
 
-    public String getDirrecion(){
-        return dirrecion;
+    public String getDireccion(){
+        return direccion;
     }
-    public void setDirrecion(String dirrecion){
-        this.dirrecion = dirrecion;
+    public void setDireccion(String direccion){
+        this.direccion = direccion;
     }
     
     public abstract String getTipo();
