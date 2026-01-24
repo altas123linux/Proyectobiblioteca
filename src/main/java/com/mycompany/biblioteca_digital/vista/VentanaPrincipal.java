@@ -376,13 +376,13 @@ InitStyles();
 
     private void boton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton2ActionPerformed
         // TODO add your handling code here:
-                ShowJPanel(new vista3());
+                ShowJPanel(new vista4());
 
     }//GEN-LAST:event_boton2ActionPerformed
 
     private void boton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton3ActionPerformed
         // TODO add your handling code here:
-                ShowJPanel(new vista4());
+                ShowJPanel(new vista3());
 
     }//GEN-LAST:event_boton3ActionPerformed
 
