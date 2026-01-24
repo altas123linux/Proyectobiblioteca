@@ -17,10 +17,20 @@
     
     <dependencies>
         <dependency>
+    <groupId>com.formdev</groupId>
+    <artifactId>flatlaf</artifactId>
+    <version>3.7</version>
+</dependency>
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>21</version>
         </dependency>
+        <dependency>
+    <groupId>com.formdev</groupId>
+    <artifactId>flatlaf-intellij-themes</artifactId>
+    <version>3.7</version>
+</dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
