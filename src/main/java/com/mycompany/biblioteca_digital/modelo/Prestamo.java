@@ -13,7 +13,7 @@ public class Prestamo{
     private LocalDate fechaDevolucionReal;
     private String estado; 
     
-    public Prestamo() {
+    public Prestamo(Usuario usuario1, Libro libro1) {
         this.estado = "ACTIVO";
     }
     

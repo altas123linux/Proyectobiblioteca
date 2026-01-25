@@ -2,11 +2,11 @@ package com.mycompany.biblioteca_digital.modelo;
 
 public class Usuario extends Persona {
     
-    private String usuario;
-    private String contraseña;
+    
+   
     private int librosPrestados;
     private int maxLibrosPrestamo;
-    private boolean activo;
+    
     
     public Usuario(){
         super();
@@ -30,19 +30,6 @@ public class Usuario extends Persona {
         return "USUARIO";
     }
 
-    public String getUsuario(){
-        return usuario;
-    }
-    public void setUsuario(String usuario){
-        this.usuario = usuario;
-    }
-    
-    public String getContrasena(){
-        return contraseña;
-    }
-    public void setContrasena(String contrasena){
-        this.contraseña = contrasena;
-    }
     
     public int getLibrosPrestados(){
         return librosPrestados;

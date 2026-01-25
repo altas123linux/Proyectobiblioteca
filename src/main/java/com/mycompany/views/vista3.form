@@ -114,7 +114,7 @@
                         <Column editable="true" title="Nombre" type="java.lang.String"/>
                         <Column editable="true" title="Apellido" type="java.lang.String"/>
                         <Column editable="true" title="Cedula" type="java.lang.String"/>
-                        <Column editable="true" title="Email" type="java.lang.String"/>
+                        <Column editable="true" title="Mail" type="java.lang.String"/>
                         <Column editable="true" title="Direcci&#xf3;n" type="java.lang.String"/>
                         <Column editable="true" title="Tipo" type="java.lang.String"/>
                         <Column editable="true" title="Usuario" type="java.lang.String"/>

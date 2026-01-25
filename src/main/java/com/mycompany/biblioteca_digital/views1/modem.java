@@ -6,7 +6,9 @@ package com.mycompany.biblioteca_digital.views1;
 
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
-
+import com.mycompany.biblioteca_digital.base_datos.PersonaDAO;
+import com.mycompany.biblioteca_digital.modelo.Persona;
+import javax.swing.JOptionPane;
 /**
  *
  * @author ALEJANDRO
@@ -44,12 +46,12 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
         vista = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnIniciarSesion = new javax.swing.JButton();
+        btnRegistrarse = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        texto3 = new javax.swing.JTextField();
-        texto5 = new javax.swing.JTextField();
+        txtUsuario = new javax.swing.JTextField();
+        txtContraseña = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
         sello1 = new javax.swing.JLabel();
@@ -64,21 +66,21 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setForeground(new java.awt.Color(0, 51, 102));
         jLabel1.setText("BIBLIOTECA VIRTUAL ");
 
-        jButton1.setBackground(new java.awt.Color(153, 0, 51));
-        jButton1.setFont(new java.awt.Font("Segoe UI Emoji", 1, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Iniciar Sesión");
-        jButton1.setBorder(null);
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton1.addActionListener(this::jButton1ActionPerformed);
+        btnIniciarSesion.setBackground(new java.awt.Color(153, 0, 51));
+        btnIniciarSesion.setFont(new java.awt.Font("Segoe UI Emoji", 1, 14)); // NOI18N
+        btnIniciarSesion.setForeground(new java.awt.Color(255, 255, 255));
+        btnIniciarSesion.setText("Iniciar Sesión");
+        btnIniciarSesion.setBorder(null);
+        btnIniciarSesion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnIniciarSesion.addActionListener(this::btnIniciarSesionActionPerformed);
 
-        jButton2.setBackground(new java.awt.Color(153, 0, 51));
-        jButton2.setFont(new java.awt.Font("Segoe UI Emoji", 1, 14)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("Registrarse");
-        jButton2.setBorder(null);
-        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton2.addActionListener(this::jButton2ActionPerformed);
+        btnRegistrarse.setBackground(new java.awt.Color(153, 0, 51));
+        btnRegistrarse.setFont(new java.awt.Font("Segoe UI Emoji", 1, 14)); // NOI18N
+        btnRegistrarse.setForeground(new java.awt.Color(255, 255, 255));
+        btnRegistrarse.setText("Registrarse");
+        btnRegistrarse.setBorder(null);
+        btnRegistrarse.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnRegistrarse.addActionListener(this::btnRegistrarseActionPerformed);
 
         jLabel2.setFont(new java.awt.Font("STZhongsong", 1, 16)); // NOI18N
         jLabel2.setText("Usuario:");
@@ -86,28 +88,28 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setFont(new java.awt.Font("STZhongsong", 1, 16)); // NOI18N
         jLabel3.setText("Contraseña:");
 
-        texto3.setForeground(new java.awt.Color(204, 204, 204));
-        texto3.setText("Ingrese su usuario");
-        texto3.setBorder(null);
-        texto3.addFocusListener(new java.awt.event.FocusAdapter() {
+        txtUsuario.setForeground(new java.awt.Color(204, 204, 204));
+        txtUsuario.setText("Ingrese su usuario");
+        txtUsuario.setBorder(null);
+        txtUsuario.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                texto3FocusGained(evt);
+                txtUsuarioFocusGained(evt);
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
-                texto3FocusLost(evt);
+                txtUsuarioFocusLost(evt);
             }
         });
-        texto3.addActionListener(this::texto3ActionPerformed);
+        txtUsuario.addActionListener(this::txtUsuarioActionPerformed);
 
-        texto5.setForeground(new java.awt.Color(204, 204, 204));
-        texto5.setText("***********");
-        texto5.setBorder(null);
-        texto5.addFocusListener(new java.awt.event.FocusAdapter() {
+        txtContraseña.setForeground(new java.awt.Color(204, 204, 204));
+        txtContraseña.setText("***********");
+        txtContraseña.setBorder(null);
+        txtContraseña.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
-                texto5FocusGained(evt);
+                txtContraseñaFocusGained(evt);
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
-                texto5FocusLost(evt);
+                txtContraseñaFocusLost(evt);
             }
         });
 
@@ -153,7 +155,7 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(vistaLayout.createSequentialGroup()
                         .addGap(70, 70, 70)
-                        .addComponent(texto3, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(vistaLayout.createSequentialGroup()
                         .addGap(70, 70, 70)
                         .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -162,7 +164,7 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
                         .addComponent(jLabel3))
                     .addGroup(vistaLayout.createSequentialGroup()
                         .addGap(70, 70, 70)
-                        .addComponent(texto5, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(vistaLayout.createSequentialGroup()
                         .addGap(70, 70, 70)
                         .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -173,10 +175,10 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
                         .addComponent(imagen8, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(vistaLayout.createSequentialGroup()
                         .addGap(50, 50, 50)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnIniciarSesion, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(60, 60, 60)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(41, Short.MAX_VALUE))
+                        .addComponent(btnRegistrarse, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
         vistaLayout.setVerticalGroup(
             vistaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -192,13 +194,13 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
                 .addGap(0, 0, 0)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
-                .addComponent(texto3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(17, 17, 17)
                 .addComponent(jLabel3)
                 .addGap(7, 7, 7)
-                .addComponent(texto5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30)
@@ -207,8 +209,8 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
                     .addComponent(imagen8, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(20, 20, 20)
                 .addGroup(vistaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(btnIniciarSesion, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRegistrarse, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -223,54 +225,112 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnIniciarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarSesionActionPerformed
+    // Obtener datos ingresados
+    String usuario = txtUsuario.getText().trim();
+    String contrasena = txtContraseña.getText().trim();
+    
+    // Validar campos vacíos
+    if (usuario.isEmpty() || contrasena.isEmpty()) {
+        JOptionPane.showMessageDialog(this,
+            "⚠ Por favor complete todos los campos",
+            "Campos Vacíos",
+            JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Intentar login
+    PersonaDAO personaDAO = new PersonaDAO();
+    Persona persona = personaDAO.login(usuario, contrasena);
+    
+    // Verificar resultado
+    if (persona != null) {
+        // Login exitoso
+        JOptionPane.showMessageDialog(this,
+            "✓ Bienvenido " + persona.getNombre() + " " + persona.getApellido() + "\n" +
+            "Tipo: " + persona.getTipo(),
+            "Login Exitoso",
+            JOptionPane.INFORMATION_MESSAGE);
+        
+        // Abrir VentanaPrincipal y pasar el usuario logueado
+        java.awt.Window ventana = javax.swing.SwingUtilities.getWindowAncestor(this);
+        ventana.dispose();
+        
+        new com.mycompany.biblioteca_digital.vista.VentanaPrincipal(persona).setVisible(true);
+        
+    } else {
+        // Login fallido
+        JOptionPane.showMessageDialog(this,
+            "✗ Usuario o contraseña incorrectos\n\n" +
+            "Por favor verifique sus credenciales e intente nuevamente.",
+            "Error de Autenticación",
+            JOptionPane.ERROR_MESSAGE);
+        
+        // Limpiar campos
+        txtContraseña.setText("");
+        txtUsuario.requestFocus();
+    }
+    }//GEN-LAST:event_btnIniciarSesionActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+    private void btnRegistrarseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarseActionPerformed
+    // Obtener el panel padre (VentanaLoading1)
+    java.awt.Container parent = this.getParent();
+    
+    // Buscar el panel de registro (registroU1)
+    for (java.awt.Component comp : parent.getComponents()) {
+        if (comp.getName() != null && comp.getName().equals("registroU1")) {
+            // Ocultar panel de login
+            this.setVisible(false);
+            // Mostrar panel de registro
+            comp.setVisible(true);
+            return;
+        }
+    }
+    
+   
+
         ShowJPanel(new registroU1());
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnRegistrarseActionPerformed
 
-    private void texto3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_texto3ActionPerformed
+    private void txtUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_texto3ActionPerformed
+    }//GEN-LAST:event_txtUsuarioActionPerformed
 
-    private void texto3FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_texto3FocusGained
+    private void txtUsuarioFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUsuarioFocusGained
         // TODO add your handling code here:
-        if (texto3.getText().equals("Ingrese su usuario")) {
-    texto3.setText("");
-    texto3.setForeground(java.awt.Color.BLACK);
-    }//GEN-LAST:event_texto3FocusGained
+        if (txtUsuario.getText().equals("Ingrese su usuario")) {
+    txtUsuario.setText("");
+    txtUsuario.setForeground(java.awt.Color.BLACK);
+    }//GEN-LAST:event_txtUsuarioFocusGained
     }
-    private void texto3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_texto3FocusLost
+    private void txtUsuarioFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUsuarioFocusLost
         // TODO add your handling code here:
-        if (texto3.getText().isEmpty()) {
-    texto3.setForeground(new java.awt.Color(153, 153, 153));
-    texto3.setText("Ingrese su usuario");
-    }//GEN-LAST:event_texto3FocusLost
+        if (txtUsuario.getText().isEmpty()) {
+    txtUsuario.setForeground(new java.awt.Color(153, 153, 153));
+    txtUsuario.setText("Ingrese su usuario");
+    }//GEN-LAST:event_txtUsuarioFocusLost
     }
-    private void texto5FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_texto5FocusGained
+    private void txtContraseñaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtContraseñaFocusGained
         // TODO add your handling code here:
-          if (texto5.getText().equals("***********")) {
-    texto5.setText("");
-    texto5.setForeground(java.awt.Color.BLACK);
+          if (txtContraseña.getText().equals("***********")) {
+    txtContraseña.setText("");
+    txtContraseña.setForeground(java.awt.Color.BLACK);
     } 
-    }//GEN-LAST:event_texto5FocusGained
+    }//GEN-LAST:event_txtContraseñaFocusGained
 
-    private void texto5FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_texto5FocusLost
+    private void txtContraseñaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtContraseñaFocusLost
         // TODO add your handling code here:
-        if (texto5.getText().isEmpty()) {
-    texto5.setForeground(new java.awt.Color(153, 153, 153));
-    texto5.setText("***********");
-    }//GEN-LAST:event_texto5FocusLost
+        if (txtContraseña.getText().isEmpty()) {
+    txtContraseña.setForeground(new java.awt.Color(153, 153, 153));
+    txtContraseña.setText("***********");
+    }//GEN-LAST:event_txtContraseñaFocusLost
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnIniciarSesion;
+    private javax.swing.JButton btnRegistrarse;
     private javax.swing.JLabel imagen7;
     private javax.swing.JLabel imagen8;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -279,8 +339,8 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel sello1;
-    private javax.swing.JTextField texto3;
-    private javax.swing.JTextField texto5;
+    private javax.swing.JTextField txtContraseña;
+    private javax.swing.JTextField txtUsuario;
     private javax.swing.JPanel vista;
     // End of variables declaration//GEN-END:variables
 

@@ -60,7 +60,7 @@
                       </Group>
                       <Group type="102" attributes="0">
                           <EmptySpace min="70" pref="70" max="-2" attributes="0"/>
-                          <Component id="texto3" min="-2" pref="290" max="-2" attributes="0"/>
+                          <Component id="txtUsuario" min="-2" pref="290" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <EmptySpace min="70" pref="70" max="-2" attributes="0"/>
@@ -72,7 +72,7 @@
                       </Group>
                       <Group type="102" attributes="0">
                           <EmptySpace min="70" pref="70" max="-2" attributes="0"/>
-                          <Component id="texto5" min="-2" pref="290" max="-2" attributes="0"/>
+                          <Component id="txtContraseña" min="-2" pref="290" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <EmptySpace min="70" pref="70" max="-2" attributes="0"/>
@@ -86,12 +86,12 @@
                       </Group>
                       <Group type="102" attributes="0">
                           <EmptySpace min="50" pref="50" max="-2" attributes="0"/>
-                          <Component id="jButton1" min="-2" pref="120" max="-2" attributes="0"/>
+                          <Component id="btnIniciarSesion" min="-2" pref="120" max="-2" attributes="0"/>
                           <EmptySpace min="60" pref="60" max="-2" attributes="0"/>
-                          <Component id="jButton2" min="-2" pref="120" max="-2" attributes="0"/>
+                          <Component id="btnRegistrarse" min="-2" pref="120" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace pref="41" max="32767" attributes="0"/>
+                  <EmptySpace pref="62" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -109,13 +109,13 @@
                   <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                   <Component id="jLabel2" min="-2" pref="40" max="-2" attributes="0"/>
                   <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
-                  <Component id="texto3" min="-2" pref="30" max="-2" attributes="0"/>
+                  <Component id="txtUsuario" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                   <Component id="jSeparator1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="17" pref="17" max="-2" attributes="0"/>
                   <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="7" pref="7" max="-2" attributes="0"/>
-                  <Component id="texto5" min="-2" pref="30" max="-2" attributes="0"/>
+                  <Component id="txtContraseña" min="-2" pref="30" max="-2" attributes="0"/>
                   <EmptySpace min="0" pref="0" max="-2" attributes="0"/>
                   <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
                   <EmptySpace min="30" pref="30" max="-2" attributes="0"/>
@@ -125,8 +125,8 @@
                   </Group>
                   <EmptySpace min="20" pref="20" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jButton1" min="-2" pref="50" max="-2" attributes="0"/>
-                      <Component id="jButton2" min="-2" pref="50" max="-2" attributes="0"/>
+                      <Component id="btnIniciarSesion" min="-2" pref="50" max="-2" attributes="0"/>
+                      <Component id="btnRegistrarse" min="-2" pref="50" max="-2" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -144,7 +144,7 @@
             <Property name="text" type="java.lang.String" value="BIBLIOTECA VIRTUAL "/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="jButton1">
+        <Component class="javax.swing.JButton" name="btnIniciarSesion">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="33" green="0" red="99" type="rgb"/>
@@ -164,10 +164,10 @@
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnIniciarSesionActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JButton" name="jButton2">
+        <Component class="javax.swing.JButton" name="btnRegistrarse">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="33" green="0" red="99" type="rgb"/>
@@ -187,7 +187,7 @@
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRegistrarseActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
@@ -206,7 +206,7 @@
             <Property name="text" type="java.lang.String" value="Contrase&#xf1;a:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JTextField" name="texto3">
+        <Component class="javax.swing.JTextField" name="txtUsuario">
           <Properties>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="cc" green="cc" red="cc" type="rgb"/>
@@ -217,12 +217,12 @@
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="texto3FocusGained"/>
-            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="texto3FocusLost"/>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="texto3ActionPerformed"/>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtUsuarioFocusGained"/>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtUsuarioFocusLost"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtUsuarioActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JTextField" name="texto5">
+        <Component class="javax.swing.JTextField" name="txtContrase&#xf1;a">
           <Properties>
             <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="cc" green="cc" red="cc" type="rgb"/>
@@ -233,8 +233,8 @@
             </Property>
           </Properties>
           <Events>
-            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="texto5FocusGained"/>
-            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="texto5FocusLost"/>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtContrase&#xf1;aFocusGained"/>
+            <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="txtContrase&#xf1;aFocusLost"/>
           </Events>
         </Component>
         <Component class="javax.swing.JSeparator" name="jSeparator1">

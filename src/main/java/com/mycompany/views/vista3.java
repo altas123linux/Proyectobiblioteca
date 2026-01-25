@@ -99,7 +99,7 @@ boton7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
                 {null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Nombre", "Apellido", "Cedula", "Email", "Dirección", "Tipo", "Usuario", "Contraseña", "Estado"
+                "ID", "Nombre", "Apellido", "Cedula", "Mail", "Dirección", "Tipo", "Usuario", "Contraseña", "Estado"
             }
         ) {
             Class[] types = new Class [] {

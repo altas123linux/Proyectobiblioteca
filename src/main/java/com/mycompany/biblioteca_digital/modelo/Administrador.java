@@ -2,10 +2,10 @@ package com.mycompany.biblioteca_digital.modelo;
 
 public class Administrador extends Persona {
     
-    private String usuario;
-    private String contraseña;
+    
+    
     private String rol; 
-    private boolean activo;
+    
     
     public Administrador() {
         super();
@@ -37,12 +37,12 @@ public class Administrador extends Persona {
         this.usuario = usuario;
     }
     
-    public String getContrasena() {
+    public String getContraseña() {
         return contraseña;
     }
     
-    public void setContrasena(String contrasena) {
-        this.contraseña = contrasena;
+    public void setContraseña(String contraseña) {
+        this.contraseña = contraseña;
     }
     
     public String getRol() {

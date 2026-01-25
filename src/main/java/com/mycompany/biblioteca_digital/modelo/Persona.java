@@ -8,6 +8,9 @@ public abstract class Persona {
     protected String apellido;
     protected String mail;
     protected String direccion;
+    protected String usuario;      
+    protected String contraseña;    
+    protected boolean activo;
     
     public Persona(){
     } //constructor vacio para unir con la base de datos
@@ -62,6 +65,27 @@ public abstract class Persona {
     public void setDireccion(String direccion){
         this.direccion = direccion;
     }
+
+    public String getUsuario() {
+        return usuario;
+    }
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getContraseña() {
+        return contraseña;
+    }
+    public void setContraseña(String contraseña) {
+        this.contraseña = contraseña;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
     
     public abstract String getTipo();
     
@@ -71,7 +95,7 @@ public abstract class Persona {
                 "cedula:'" + cedula + '\'' +
                 ", nombre:'" + nombre + '\'' +
                 ", apellido.'" + apellido + '\'' +
-                ", email:'" + mail + '\'' +
+                ", mail:'" + mail + '\'' +
                 '}';
     }
 }

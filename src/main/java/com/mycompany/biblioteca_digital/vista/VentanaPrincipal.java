@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.biblioteca_digital.vista;
+
 import java.awt.Color;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMTMaterialLighterIJTheme;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import javax.swing.JPanel;
+import com.mycompany.biblioteca_digital.modelo.Persona;
 
 /**
  *
@@ -26,15 +28,38 @@ import javax.swing.JPanel;
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName());
-
+    private Persona usuarioLogueado;
     /**
      * Creates new form VentanaPrincipal
      */
-    public VentanaPrincipal() {
-        initComponents();
-        setdate();
-        InitContent();
+public VentanaPrincipal() {
+    initComponents();
+    setLocationRelativeTo(null);
+}
+
+// Constructor que recibe el usuario logueado
+public VentanaPrincipal(Persona usuario) {
+    this.usuarioLogueado = usuario;
+    initComponents();
+    setLocationRelativeTo(null);
+    
+    // Mostrar información del usuario
+    configurarInterfazUsuario();
+}
+
+/**
+ * Configurar la interfaz según el usuario logueado
+ */
+private void configurarInterfazUsuario() {
+    if (usuarioLogueado != null) {
+        // Aquí puedes mostrar el nombre del usuario en un label
+        // Por ejemplo: lblNombreUsuario.setText(usuarioLogueado.getNombre());
+        
+        System.out.println("Usuario logueado: " + usuarioLogueado.getNombre() + 
+                         " " + usuarioLogueado.getApellido());
+        System.out.println("Tipo: " + usuarioLogueado.getTipo());
+        
+}
         // Esto escala el icono que ya pusiste en Propiedades al tamaño del botón
         // 1. Cargar y escalar la imagen (tu línea con un pequeño ajuste)
 sello.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/sello.png")).getImage().getScaledInstance(180, 160, java.awt.Image.SCALE_SMOOTH)));

@@ -47,10 +47,10 @@ public class RegistroUsuario {
     /**
      * Validar login de usuario
      */
-    public Usuario login(String nombreUsuario, String contrasena) {
+    public Usuario login(String nombreUsuario, String contraseña) {
         for (Usuario usuario : usuarios) {
             if (usuario.getUsuario().equals(nombreUsuario) && 
-                usuario.getContrasena().equals(contrasena)) {
+                usuario.getContraseña().equals(contraseña)) {
                 
                 // Verificar que esté activo
                 if (!usuario.isActivo()) {
@@ -166,9 +166,9 @@ public class RegistroUsuario {
             return false;
         }
         
-        // Validar email
+        // Validar mail
         if (usuario.getMail() == null || !usuario.getMail().contains("@")) {
-            System.out.println("Error: El email es inválido");
+            System.out.println("Error: El mail es inválido");
             return false;
         }
         
@@ -179,7 +179,7 @@ public class RegistroUsuario {
         }
         
         // Validar contraseña
-        if (usuario.getContrasena() == null || usuario.getContrasena().length() < 6) {
+        if (usuario.getContraseña() == null || usuario.getContraseña().length() < 6) {
             System.out.println("Error: La contraseña debe tener al menos 6 caracteres");
             return false;
         }
@@ -190,7 +190,7 @@ public class RegistroUsuario {
     /**
      * Cambiar contraseña
      */
-    public boolean cambiarContrasena(String cedula, String contrasenaActual, String contrasenaNueva) {
+    public boolean cambiarContraseña(String cedula, String contraseñaActual, String contraseñaNueva) {
         Usuario usuario = buscarPorCedula(cedula);
         
         if (usuario == null) {
@@ -199,18 +199,18 @@ public class RegistroUsuario {
         }
         
         // Verificar contraseña actual
-        if (!usuario.getContrasena().equals(contrasenaActual)) {
+        if (!usuario.getContraseña().equals(contraseñaActual)) {
             System.out.println("Error: Contraseña actual incorrecta");
             return false;
         }
         
         // Validar nueva contraseña
-        if (contrasenaNueva.length() < 6) {
+        if (contraseñaNueva.length() < 6) {
             System.out.println("Error: La nueva contraseña debe tener al menos 6 caracteres");
             return false;
         }
         
-        usuario.setContrasena(contrasenaNueva);
+        usuario.setContraseña(contraseñaNueva);
         System.out.println("Contraseña actualizada para: " + usuario.getNombre());
         return true;
     }
