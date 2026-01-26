@@ -3,10 +3,9 @@ package com.mycompany.biblioteca_digital.vista;
 import java.awt.Color;
 import java.awt.Image;
 import javax.swing.ImageIcon;
-import com.formdev.flatlaf.FlatLightLaf;
+
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMTMaterialLighterIJTheme;
-import com.mycompany.views.registroL;
-import com.mycompany.views.registroU;
+
 import java.awt.BorderLayout;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

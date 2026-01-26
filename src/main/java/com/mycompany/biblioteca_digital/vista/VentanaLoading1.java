@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.mycompany.biblioteca_digital.vista;
 
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMTMaterialLighterIJTheme;
@@ -12,17 +8,11 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
 
-/**
- *
- * @author ALEJANDRO
- */
 public class VentanaLoading1 extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VentanaLoading1.class.getName());
 
-    /**
-     * Creates new form VentanaLoading1
-     */
+    
     public VentanaLoading1() {
         initComponents();
         initcontents();
@@ -34,7 +24,7 @@ portada1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 private void initcontents(){
   ShowJPanel(new modem());
 }
-  private void ShowJPanel(JPanel v1){
+  public void ShowJPanel(JPanel v1){
         v1.setSize(420,710);
         v1.setLocation(0,0);
         
