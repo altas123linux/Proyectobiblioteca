@@ -11,14 +11,14 @@ public class PruebaLogin {
         
         // Probar con el usuario que ves en phpMyAdmin
         String usuario = "clgalarza1";
-        String contrasena = "password";
+        String contraseña = "password";
         
         System.out.println("Intentando login con:");
         System.out.println("Usuario: " + usuario);
-        System.out.println("Contraseña: " + contrasena);
+        System.out.println("Contraseña: " + contraseña);
         System.out.println();
         
-        Persona persona = dao.login(usuario, contrasena);
+        Persona persona = dao.login(usuario, contraseña);
         
         if (persona != null) {
             System.out.println("✓ LOGIN EXITOSO");

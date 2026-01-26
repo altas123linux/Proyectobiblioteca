@@ -228,10 +228,10 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     private void btnIniciarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarSesionActionPerformed
     // Obtener datos ingresados
     String usuario = txtUsuario.getText().trim();
-    String contrasena = txtContraseña.getText().trim();
+    String contraseña = txtContraseña.getText().trim();
     
     // Validar campos vacíos
-    if (usuario.isEmpty() || contrasena.isEmpty()) {
+    if (usuario.isEmpty() || contraseña.isEmpty()) {
         JOptionPane.showMessageDialog(this,
             "⚠ Por favor complete todos los campos",
             "Campos Vacíos",
@@ -241,7 +241,7 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     
     // Intentar login
     PersonaDAO personaDAO = new PersonaDAO();
-    Persona persona = personaDAO.login(usuario, contrasena);
+    Persona persona = personaDAO.login(usuario, contraseña);
     
     // Verificar resultado
     if (persona != null) {
