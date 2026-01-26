@@ -1,24 +1,33 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package com.mycompany.views;
 
 import java.awt.Image;
 import javax.swing.ImageIcon;
+import com.mycompany.biblioteca_digital.base_datos.PrestamoDAO;
+import com.mycompany.biblioteca_digital.modelo.Prestamo;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+import java.time.format.DateTimeFormatter;
 
-/**
- *
- * @author ALEJANDRO
- */
 public class vista6 extends javax.swing.JPanel {
 
-    /**
-     * Creates new form vista1
-     */
+    private PrestamoDAO prestamoDAO;
+    private DefaultTableModel modeloTabla;
+    private DateTimeFormatter formatoFecha;
+    
     public vista6() {
         initComponents();
-        // Esto quita el recuadro que indica qué celda está seleccionada
+        inicializar();
+}
+
+/**
+ * Inicializar componentes personalizados
+ */
+private void inicializar() {
+    prestamoDAO = new PrestamoDAO();
+    formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    configurarTabla();
+    cargarReportes();
+    
 jTable3.setFocusable(false);
 jTable3.setCellSelectionEnabled(false); // Opcional, si no necesitas seleccionar celdas individuales
         
@@ -35,12 +44,158 @@ margen.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().ge
 margen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 }
     
+  /**
+ * Configurar columnas de la tabla
+ */
+private void configurarTabla() {
+    String[] columnas = {"ID", "Usuario", "Cédula", "Libro", "ISBN", 
+                        "Fecha Préstamo", "Fecha Esperada", "Fecha Real", "Estado"};
+    modeloTabla = new DefaultTableModel(columnas, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+    
+    jTable3.setModel(modeloTabla);
+    
+    // Ajustar anchos
+    jTable3.getColumnModel().getColumn(0).setPreferredWidth(50);  // ID
+    jTable3.getColumnModel().getColumn(1).setPreferredWidth(150); // Usuario
+    jTable3.getColumnModel().getColumn(2).setPreferredWidth(100); // Cédula
+    jTable3.getColumnModel().getColumn(3).setPreferredWidth(200); // Libro
+    jTable3.getColumnModel().getColumn(4).setPreferredWidth(120); // ISBN
+    jTable3.getColumnModel().getColumn(5).setPreferredWidth(100); // Fecha Préstamo
+    jTable3.getColumnModel().getColumn(6).setPreferredWidth(100); // Fecha Esperada
+    jTable3.getColumnModel().getColumn(7).setPreferredWidth(100); // Fecha Real
+    jTable3.getColumnModel().getColumn(8).setPreferredWidth(100); // Estado
+}
+
+/**
+ * Cargar todos los préstamos (historial completo)
+ */
+private void cargarReportes() {
+    modeloTabla.setRowCount(0);
+    
+    List<Prestamo> prestamos = prestamoDAO.obtenerTodos();
+    
+    for (Prestamo prestamo : prestamos) {
+        String nombreUsuario = prestamo.getUsuario().getNombre() + " " + 
+                              prestamo.getUsuario().getApellido();
+        
+        String fechaPrestamo = prestamo.getFechaPrestamo().format(formatoFecha);
+        String fechaEsperada = prestamo.getFechaDevolucionEsperada().format(formatoFecha);
+        
+        String fechaReal = "-";
+        if (prestamo.getFechaDevolucionReal() != null) {
+            fechaReal = prestamo.getFechaDevolucionReal().format(formatoFecha);
+        }
+        
+        // Determinar estado
+        String estado = prestamo.getEstado();
+        if ("ACTIVO".equals(estado) && 
+            prestamo.getFechaDevolucionEsperada().isBefore(java.time.LocalDate.now())) {
+            estado = "VENCIDO";
+        }
+        
+        Object[] fila = {
+            prestamo.getIdPrestamo(),
+            nombreUsuario,
+            prestamo.getUsuario().getCedula(),
+            prestamo.getLibro().getTitulo(),
+            prestamo.getLibro().getIsbn(),
+            fechaPrestamo,
+            fechaEsperada,
+            fechaReal,
+            estado
+        };
+        modeloTabla.addRow(fila);
+    }
+    
+    System.out.println("✓ Reportes cargados: " + prestamos.size() + " préstamos");
+}
+
+/**
+ * Filtrar por estado
+ */
+private void filtrarPorEstado(String estado) {
+    modeloTabla.setRowCount(0);
+    
+    List<Prestamo> prestamos;
+    
+    if ("TODOS".equals(estado)) {
+        prestamos = prestamoDAO.obtenerTodos();
+    } else if ("ACTIVOS".equals(estado)) {
+        prestamos = prestamoDAO.obtenerActivos();
+    } else if ("VENCIDOS".equals(estado)) {
+        prestamos = prestamoDAO.obtenerVencidos();
+    } else {
+        // Cargar todos y filtrar por DEVUELTO
+        prestamos = prestamoDAO.obtenerTodos();
+        prestamos.removeIf(p -> !"DEVUELTO".equals(p.getEstado()));
+    }
+    
+    for (Prestamo prestamo : prestamos) {
+        String nombreUsuario = prestamo.getUsuario().getNombre() + " " + 
+                              prestamo.getUsuario().getApellido();
+        
+        String fechaPrestamo = prestamo.getFechaPrestamo().format(formatoFecha);
+        String fechaEsperada = prestamo.getFechaDevolucionEsperada().format(formatoFecha);
+        
+        String fechaReal = "-";
+        if (prestamo.getFechaDevolucionReal() != null) {
+            fechaReal = prestamo.getFechaDevolucionReal().format(formatoFecha);
+        }
+        
+        String estadoActual = prestamo.getEstado();
+        if ("ACTIVO".equals(estadoActual) && 
+            prestamo.getFechaDevolucionEsperada().isBefore(java.time.LocalDate.now())) {
+            estadoActual = "VENCIDO";
+        }
+        
+        Object[] fila = {
+            prestamo.getIdPrestamo(),
+            nombreUsuario,
+            prestamo.getUsuario().getCedula(),
+            prestamo.getLibro().getTitulo(),
+            prestamo.getLibro().getIsbn(),
+            fechaPrestamo,
+            fechaEsperada,
+            fechaReal,
+            estadoActual
+        };
+        modeloTabla.addRow(fila);
+    }
+}
+
+/**
+ * Obtener estadísticas
+ */
+private String obtenerEstadisticas() {
+    List<Prestamo> prestamos = prestamoDAO.obtenerTodos();
+    
+    int totalPrestamos = prestamos.size();
+    int activos = (int) prestamos.stream()
+        .filter(p -> "ACTIVO".equals(p.getEstado()))
+        .count();
+    int devueltos = (int) prestamos.stream()
+        .filter(p -> "DEVUELTO".equals(p.getEstado()))
+        .count();
+    int vencidos = (int) prestamos.stream()
+        .filter(p -> "ACTIVO".equals(p.getEstado()) && 
+                     p.getFechaDevolucionEsperada().isBefore(java.time.LocalDate.now()))
+        .count();
+    
+    return String.format(
+        "ESTADÍSTICAS DE PRÉSTAMOS\n\n" +
+        "Total de préstamos: %d\n" +
+        "Préstamos activos: %d\n" +
+        "Préstamos devueltos: %d\n" +
+        "Préstamos vencidos: %d",
+        totalPrestamos, activos, devueltos, vencidos
+    );
+}
   
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -135,6 +290,7 @@ margen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         boton12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/actualizar.png"))); // NOI18N
         boton12.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0)));
         boton12.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        boton12.addActionListener(this::boton12ActionPerformed);
         bg.add(boton12, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 350, 100, 60));
 
         jLabel3.setFont(new java.awt.Font("STZhongsong", 1, 18)); // NOI18N
@@ -171,6 +327,57 @@ margen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 jTable3.clearSelection(); 
 this.requestFocusInWindow();        // TODO add your handling code here:
     }//GEN-LAST:event_bgMousePressed
+
+    private void boton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton12ActionPerformed
+        String[] opciones = {"Actualizar", "Ver Activos", "Ver Devueltos", "Ver Vencidos", 
+                        "Ver Todos", "Estadísticas"};
+    
+    String seleccion = (String) javax.swing.JOptionPane.showInputDialog(
+        this,
+        "Seleccione una opción:",
+        "Opciones de Reportes",
+        javax.swing.JOptionPane.QUESTION_MESSAGE,
+        null,
+        opciones,
+        opciones[0]
+    );
+    
+    if (seleccion != null) {
+        switch (seleccion) {
+            case "Actualizar":
+                cargarReportes();
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    "✓ Reportes actualizados",
+                    "Éxito",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                break;
+                
+            case "Ver Activos":
+                filtrarPorEstado("ACTIVOS");
+                break;
+                
+            case "Ver Devueltos":
+                filtrarPorEstado("DEVUELTO");
+                break;
+                
+            case "Ver Vencidos":
+                filtrarPorEstado("VENCIDOS");
+                break;
+                
+            case "Ver Todos":
+                filtrarPorEstado("TODOS");
+                break;
+                
+            case "Estadísticas":
+                String stats = obtenerEstadisticas();
+                javax.swing.JOptionPane.showMessageDialog(this,
+                    stats,
+                    "Estadísticas",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                break;
+            }
+        }
+    }//GEN-LAST:event_boton12ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

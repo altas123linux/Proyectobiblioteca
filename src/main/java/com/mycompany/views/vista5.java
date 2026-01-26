@@ -1,24 +1,28 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package com.mycompany.views;
 
 import java.awt.Image;
 import javax.swing.ImageIcon;
+import com.mycompany.biblioteca_digital.base_datos.LibroDAO;
+import com.mycompany.biblioteca_digital.modelo.Libro;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
 
-/**
- *
- * @author ALEJANDRO
- */
 public class vista5 extends javax.swing.JPanel {
 
-    /**
-     * Creates new form vista1
-     */
+    private LibroDAO libroDAO;
+    private DefaultTableModel modeloTabla;
+    
     public vista5() {
         initComponents();
-        // Esto quita el recuadro que indica qué celda está seleccionada
+        // Inicializar DAO
+    libroDAO = new LibroDAO();
+    
+    // Configurar tabla
+    configurarTabla();
+    
+    // Cargar libros
+    cargarLibros();
 jTable2.setFocusable(false);
 jTable2.setCellSelectionEnabled(false); // Opcional, si no necesitas seleccionar celdas individuales
         
@@ -44,7 +48,119 @@ boton11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
 }
     
-  
+  /**
+ * Configurar columnas de la tabla
+ */
+private void configurarTabla() {
+    // Crear modelo de tabla
+    String[] columnas = {"ID", "ISBN", "Título", "Autor", "Editorial", 
+                        "Año", "Categoría", "Cantidad Total", "Disponible"};
+    modeloTabla = new DefaultTableModel(columnas, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false; // No editable
+        }
+    };
+    
+    jTable2.setModel(modeloTabla);
+    
+    // Ajustar ancho de columnas
+    jTable2.getColumnModel().getColumn(0).setPreferredWidth(50);  // ID
+    jTable2.getColumnModel().getColumn(1).setPreferredWidth(120); // ISBN
+    jTable2.getColumnModel().getColumn(2).setPreferredWidth(200); // Título
+    jTable2.getColumnModel().getColumn(3).setPreferredWidth(150); // Autor
+    jTable2.getColumnModel().getColumn(4).setPreferredWidth(120); // Editorial
+    jTable2.getColumnModel().getColumn(5).setPreferredWidth(60);  // Año
+    jTable2.getColumnModel().getColumn(6).setPreferredWidth(100); // Categoría
+    jTable2.getColumnModel().getColumn(7).setPreferredWidth(80);  // Total
+    jTable2.getColumnModel().getColumn(8).setPreferredWidth(80);  // Disponible
+}
+
+/**
+ * Cargar todos los libros en la tabla
+ */
+private void cargarLibros() {
+    // Limpiar tabla
+    modeloTabla.setRowCount(0);
+    
+    // Obtener libros de la BD
+    List<Libro> libros = libroDAO.obtenerTodos();
+    
+    // Llenar tabla
+    for (Libro libro : libros) {
+        Object[] fila = {
+            libro.getIdLibro(),
+            libro.getIsbn(),
+            libro.getTitulo(),
+            libro.getAutor(),
+            libro.getEditorial(),
+            libro.getAño(),
+            libro.getCategoria(),
+            libro.getCantidadTotal(),
+            libro.getCantidadDisponible()
+        };
+        modeloTabla.addRow(fila);
+    }
+    
+    // Mostrar mensaje en consola
+    System.out.println("✓ Se cargaron " + libros.size() + " libros en la tabla");
+}
+
+/**
+ * Buscar libros por título
+ */
+private void buscarLibros(String texto) {
+    // Limpiar tabla
+    modeloTabla.setRowCount(0);
+    
+    if (texto.trim().isEmpty()) {
+        // Si está vacío, cargar todos
+        cargarLibros();
+        return;
+    }
+    
+    // Buscar en BD
+    List<Libro> libros = libroDAO.buscarPorTitulo(texto);
+    
+    // Llenar tabla
+    for (Libro libro : libros) {
+        Object[] fila = {
+            libro.getIdLibro(),
+            libro.getIsbn(),
+            libro.getTitulo(),
+            libro.getAutor(),
+            libro.getEditorial(),
+            libro.getAño(),
+            libro.getCategoria(),
+            libro.getCantidadTotal(),
+            libro.getCantidadDisponible()
+        };
+        modeloTabla.addRow(fila);
+    }
+    
+    System.out.println("✓ Se encontraron " + libros.size() + " libros");
+}
+
+/**
+ * Obtener libro seleccionado
+ */
+private Libro obtenerLibroSeleccionado() {
+    int filaSeleccionada = jTable2.getSelectedRow();
+    
+    if (filaSeleccionada == -1) {
+        JOptionPane.showMessageDialog(this,
+            "Por favor seleccione un libro de la tabla",
+            "Ningún Libro Seleccionado",
+            JOptionPane.WARNING_MESSAGE);
+        return null;
+    }
+    
+    // Obtener ID del libro
+    int idLibro = (int) modeloTabla.getValueAt(filaSeleccionada, 0);
+    
+    // Buscar el libro completo
+    return libroDAO.buscarPorId(idLibro);
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -163,6 +279,11 @@ boton11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
             }
         });
         jTextField1.addActionListener(this::jTextField1ActionPerformed);
+        jTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField1KeyReleased(evt);
+            }
+        });
         bg.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, 500, 30));
 
         jSeparator1.setBackground(new java.awt.Color(0, 51, 153));
@@ -187,6 +308,7 @@ boton11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         boton11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono4_1.png"))); // NOI18N
         boton11.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0)));
         boton11.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        boton11.addActionListener(this::boton11ActionPerformed);
         bg.add(boton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 360, 80, 50));
 
         jLabel1.setFont(new java.awt.Font("STZhongsong", 1, 18)); // NOI18N
@@ -236,11 +358,23 @@ boton11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     }//GEN-LAST:event_jTextField1FocusLost
 
     private void boton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton10ActionPerformed
-        // TODO add your handling code here:
+Libro libro = obtenerLibroSeleccionado();
+    
+    if (libro != null) {
+        JOptionPane.showMessageDialog(this,
+            "Funcionalidad de Editar Libro\n\n" +
+            "Libro seleccionado: " + libro.getTitulo(),
+            "Editar Libro",
+            JOptionPane.INFORMATION_MESSAGE);        
     }//GEN-LAST:event_boton10ActionPerformed
-
+    }
     private void boton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton9ActionPerformed
-        // TODO add your handling code here:
+    JOptionPane.showMessageDialog(this,
+        "Funcionalidad de Nuevo Libro\n\n" +
+        "Aquí se abrirá un formulario para agregar un nuevo libro",
+        "Nuevo Libro",
+        JOptionPane.INFORMATION_MESSAGE);
+    
     }//GEN-LAST:event_boton9ActionPerformed
 
     private void jTable2ComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jTable2ComponentMoved
@@ -256,6 +390,48 @@ boton11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 jTable2.clearSelection(); 
 this.requestFocusInWindow();        // TODO add your handling code here:
     }//GEN-LAST:event_bgMousePressed
+
+    private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
+     String textoBusqueda = jTextField1.getText();
+    buscarLibros(textoBusqueda);
+    }//GEN-LAST:event_jTextField1KeyReleased
+
+    private void boton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton11ActionPerformed
+    Libro libro = obtenerLibroSeleccionado();
+    
+    if (libro == null) {
+        return;
+    }
+    
+    // Confirmar eliminación
+    int confirmacion = JOptionPane.showConfirmDialog(this,
+        "¿Está seguro de que desea eliminar este libro?\n\n" +
+        "Título: " + libro.getTitulo() + "\n" +
+        "Autor: " + libro.getAutor() + "\n\n" +
+        "Esta acción marcará el libro como inactivo.",
+        "Confirmar Eliminación",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE);
+    
+    if (confirmacion == JOptionPane.YES_OPTION) {
+        boolean exito = libroDAO.eliminar(libro.getIdLibro());
+        
+        if (exito) {
+            JOptionPane.showMessageDialog(this,
+                "✓ Libro eliminado correctamente",
+                "Éxito",
+                JOptionPane.INFORMATION_MESSAGE);
+            
+            // Recargar tabla
+            cargarLibros();
+        } else {
+            JOptionPane.showMessageDialog(this,
+                "Error al eliminar el libro",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    }//GEN-LAST:event_boton11ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

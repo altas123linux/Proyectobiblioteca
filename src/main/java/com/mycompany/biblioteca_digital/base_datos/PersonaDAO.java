@@ -133,6 +133,77 @@ public class PersonaDAO {
     }
     
     /**
+ * Buscar persona por ID
+ */
+public Persona buscarPorId(int idPersona) {
+    String sql = "SELECT * FROM personas WHERE id_persona = ?";
+    
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+    
+    try {
+        conn = ConexionBD.obtenerConexion();
+        stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, idPersona);
+        
+        rs = stmt.executeQuery();
+        
+        if (rs.next()) {
+            return crearPersonaDesdeResultSet(rs);
+        }
+        
+        return null;
+        
+    } catch (SQLException e) {
+        System.err.println("✗ Error al buscar persona por ID: " + e.getMessage());
+        return null;
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            System.err.println("Error al cerrar recursos: " + e.getMessage());
+        }
+    }
+}
+/**
+ * Eliminar persona (marcar como inactivo)
+ */
+public boolean eliminar(int idPersona) {
+    String sql = "UPDATE personas SET activo = 0 WHERE id_persona = ?";
+    
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    
+    try {
+        conn = ConexionBD.obtenerConexion();
+        stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, idPersona);
+        
+        int filasAfectadas = stmt.executeUpdate();
+        
+        if (filasAfectadas > 0) {
+            System.out.println("✓ Persona eliminada (inactiva): ID " + idPersona);
+            return true;
+        }
+        
+        return false;
+        
+    } catch (SQLException e) {
+        System.err.println("✗ Error al eliminar persona: " + e.getMessage());
+        return false;
+    } finally {
+        try {
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            System.err.println("Error al cerrar recursos: " + e.getMessage());
+        }
+    }
+}
+    /**
      * Login - Validar usuario y contraseña
      */
     public Persona login(String nombreUsuario, String contraseña) {

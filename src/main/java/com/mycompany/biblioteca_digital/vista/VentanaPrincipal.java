@@ -1,27 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.mycompany.biblioteca_digital.vista;
 
 import java.awt.Color;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMTMaterialLighterIJTheme;
 import com.mycompany.views.registroL;
 import com.mycompany.views.registroU;
-import com.mycompany.views.vista1;
-import com.mycompany.views.vista2;
-import com.mycompany.views.vista3;
-import com.mycompany.views.vista4;
-import com.mycompany.views.vista5;
-import com.mycompany.views.vista6;
 import java.awt.BorderLayout;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import javax.swing.JPanel;
 import com.mycompany.biblioteca_digital.modelo.Persona;
-
+import com.mycompany.views.*;
 /**
  *
  * @author ALEJANDRO
@@ -33,88 +25,89 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      * Creates new form VentanaPrincipal
      */
 public VentanaPrincipal() {
-    initComponents();
-    setLocationRelativeTo(null);
-}
+        initComponents();
+        initCustomConfig();
+    }
 
 // Constructor que recibe el usuario logueado
-public VentanaPrincipal(Persona usuario) {
-    this.usuarioLogueado = usuario;
-    initComponents();
-    setLocationRelativeTo(null);
-    
-    // Mostrar información del usuario
-    configurarInterfazUsuario();
-}
 
-/**
- * Configurar la interfaz según el usuario logueado
- */
-private void configurarInterfazUsuario() {
-    if (usuarioLogueado != null) {
-        // Aquí puedes mostrar el nombre del usuario en un label
-        // Por ejemplo: lblNombreUsuario.setText(usuarioLogueado.getNombre());
-        
-        System.out.println("Usuario logueado: " + usuarioLogueado.getNombre() + 
-                         " " + usuarioLogueado.getApellido());
-        System.out.println("Tipo: " + usuarioLogueado.getTipo());
-        
-}
+   
+
+    public VentanaPrincipal(Persona usuario) {
+        this.usuarioLogueado = usuario;
+        initComponents();
+        initCustomConfig();
+        configurarInterfazUsuario();
+    }
+
+    /**
+     * Configuración personalizada que NO se borra al usar el editor de NetBeans
+     */
+    private void initCustomConfig() {
+        setLocationRelativeTo(null);
+        setdate();
+        InitStyles();
+        setupIcons(); // Método separado para no ensuciar el constructor
+        InitContent(); // Carga la primera vista
+    }
+
+    private void configurarInterfazUsuario() {
+        if (usuarioLogueado != null) {
+            System.out.println("Usuario logueado: " + usuarioLogueado.getNombre());
+        }
+    }
         // Esto escala el icono que ya pusiste en Propiedades al tamaño del botón
         // 1. Cargar y escalar la imagen (tu línea con un pequeño ajuste)
-sello.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/sello.png")).getImage().getScaledInstance(180, 160, java.awt.Image.SCALE_SMOOTH)));
+private void setupIcons() {
+        // Escalar Sello
+        sello.setIcon(getScaledIcon("/imagenes/sello.png", 180, 160));
+        sello.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        sello.setOpaque(false);
+        sello.setText(""); // Quitar el "1" que tenía de texto
 
-// 2. Forzar el centrado horizontal dentro del espacio del Label
-sello.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-// 3. Hacer el fondo transparente para que no se vea el cuadro blanco si la imagen es PNG
-sello.setOpaque(false);
-// Botón PRINCIPAL
-boton.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/principal.png")).getImage().getScaledInstance(38, 39, java.awt.Image.SCALE_SMOOTH)));
-
-// Botón PRESTAMOS
-boton1.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/prestamo.png")).getImage().getScaledInstance(38, 39, java.awt.Image.SCALE_SMOOTH)));
-
-// Botón DEVOLUCIONES
-boton2.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/devolucion.png")).getImage().getScaledInstance(38, 39, java.awt.Image.SCALE_SMOOTH)));
-
-// Botón USUARIOS
-boton3.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/usuario.png")).getImage().getScaledInstance(38, 39, java.awt.Image.SCALE_SMOOTH)));
-
-// Botón LIBROS
-boton4.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/libro.png")).getImage().getScaledInstance(38, 39, java.awt.Image.SCALE_SMOOTH)));
-
-// Botón REPORT
-boton6.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/reporte.png")).getImage().getScaledInstance(38, 39, java.awt.Image.SCALE_SMOOTH)));
-
-
-InitStyles();
- 
+        // Escalar Iconos de Botones (38x39 según tu código original)
+        boton.setIcon(getScaledIcon("/imagenes/principal.png", 38, 39));
+        boton1.setIcon(getScaledIcon("/imagenes/prestamo.png", 38, 39));
+        boton2.setIcon(getScaledIcon("/imagenes/devolucion.png", 38, 39));
+        boton3.setIcon(getScaledIcon("/imagenes/usuario.png", 38, 39));
+        boton4.setIcon(getScaledIcon("/imagenes/libro.png", 38, 39));
+        boton6.setIcon(getScaledIcon("/imagenes/reporte.png", 38, 39));
     }
-    private void setdate(){
+private ImageIcon getScaledIcon(String path, int width, int height) {
+        try {
+            Image img = new ImageIcon(getClass().getResource(path)).getImage();
+            return new ImageIcon(img.getScaledInstance(width, height, Image.SCALE_SMOOTH));
+        } catch (Exception e) {
+            System.err.println("No se pudo cargar la imagen: " + path);
+            return null;
+        }
+    }
+
+private void setdate() {
         LocalDate now = LocalDate.now();
-        Locale spanishLocale = new Locale("es","ES");
+        Locale spanishLocale = new Locale("es", "ES");
         etiqueta2.setText(now.format(DateTimeFormatter.ofPattern("'Hoy es' EEEE dd 'de' MMMM 'de' yyyy", spanishLocale)));
     }
-    private void InitStyles(){
-        etiqueta.putClientProperty( "FlatLaf.style", "font: bold $h1.regular.font" );
+
+    private void InitStyles() {
+        etiqueta.putClientProperty("FlatLaf.style", "font: bold $h1.regular.font");
         etiqueta.setForeground(Color.black);
-        etiqueta1.putClientProperty( "FlatLaf.style", "font: bold $h1.regular.font" );
+        etiqueta1.putClientProperty("FlatLaf.style", "font: bold $h1.regular.font");
         etiqueta1.setForeground(Color.white);
-        etiqueta2.putClientProperty( "FlatLaf.style", "font: bold $h1.regular.font" );
+        etiqueta2.putClientProperty("FlatLaf.style", "font: bold $h1.regular.font");
         etiqueta2.setForeground(Color.white);
-       //etiqueta3.putClientProperty( "FlatLaf.style", "font: bold $h1.regular.font" );
-       // etiqueta3.setForeground(Color.white);
     }
-    private void InitContent(){
+
+    private void InitContent() {
         ShowJPanel(new vista1());
     }
-    private void ShowJPanel(JPanel v1){
-        v1.setSize(706,457);
-        v1.setLocation(0,0);
+    private void ShowJPanel(JPanel v1) {
+        v1.setSize(706, 457);
+        v1.setLocation(0, 0);
         
         ventana.removeAll();
-        ventana.add(v1,BorderLayout.CENTER);
+        ventana.setLayout(new BorderLayout()); // Importante para que se vea bien
+        ventana.add(v1, BorderLayout.CENTER);
         ventana.revalidate();
         ventana.repaint();
     }
@@ -123,7 +116,7 @@ InitStyles();
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
-    @SuppressWarnings("unchecked")
+   
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
