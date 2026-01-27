@@ -1,12 +1,14 @@
 package com.mycompany.views;
 
-import java.awt.Image;
-import javax.swing.ImageIcon;
+
 import com.mycompany.biblioteca_digital.base_datos.PrestamoDAO;
 import com.mycompany.biblioteca_digital.base_datos.LibroDAO;
 import com.mycompany.biblioteca_digital.base_datos.PersonaDAO;
 import com.mycompany.biblioteca_digital.modelo.Prestamo;
 import com.mycompany.biblioteca_digital.modelo.Libro;
+import com.mycompany.biblioteca_digital.modelo.Persona;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import javax.swing.JOptionPane;
 
@@ -29,205 +31,226 @@ private void inicializar() {
     libroDAO = new LibroDAO();
     personaDAO = new PersonaDAO();
         
-foto2.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/entrada.png")).getImage().getScaledInstance(350, 500, java.awt.Image.SCALE_SMOOTH)));
+// Configurar imagen
+        foto2.setIcon(new javax.swing.ImageIcon(
+            new javax.swing.ImageIcon(getClass().getResource("/imagenes/entrada.png"))
+            .getImage().getScaledInstance(350, 500, java.awt.Image.SCALE_SMOOTH)));
+        foto2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        
+        // Cargar usuarios
+        cargarUsuarios();
+    }
+/**
+     * Cargar usuarios en el ComboBox
+     */
+    private void cargarUsuarios() {
+        cmbUsuarios.removeAllItems();
+        cmbUsuarios.addItem("-- Seleccione un usuario --");
+        
+        List<Persona> usuarios = personaDAO.obtenerTodos();
+        int count = 0;
+        for (Persona persona : usuarios) {
+            if (persona.isActivo() && "USUARIO".equals(persona.getTipo())) {
+                String item = persona.getIdPersona() + " - " + 
+                             persona.getNombre() + " " + persona.getApellido() + 
+                             " (" + persona.getCedula() + ")";
+                cmbUsuarios.addItem(item);
+                count++;
+            }
+        }
+        
+        System.out.println("✓ Cargados " + count + " usuarios en devoluciones");
+        
+        if (cmbUsuarios.getItemCount() > 0) {
+            cmbUsuarios.setSelectedIndex(0);
+        }
+    }
 
-// 2. Forzar el centrado horizontal dentro del espacio del Label
-foto2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    /**
+     * Cargar libros prestados por el usuario seleccionado
+     */
+    private void cargarLibrosPrestados() {
+        cmbLibros.removeAllItems();
+        cmbLibros.addItem("-- Seleccione un libro --");
+        
+        String usuarioSel = (String) cmbUsuarios.getSelectedItem();
+        
+        if (usuarioSel == null || usuarioSel.startsWith("--")) {
+            System.out.println("⚠ No hay usuario seleccionado");
+            return;
+        }
+        
+        try {
+            // Extraer ID del usuario
+            int idUsuario = Integer.parseInt(usuarioSel.split(" - ")[0].trim());
+            
+            // Obtener préstamos activos del usuario
+            List<Prestamo> prestamos = prestamoDAO.obtenerPorUsuario(idUsuario);
+            
+            int count = 0;
+            for (Prestamo p : prestamos) {
+                if ("ACTIVO".equals(p.getEstado())) {
+                    Libro libro = p.getLibro();
+                    String item = p.getIdPrestamo() + " | Libro: " + libro.getTitulo() + 
+                                 " | Prestado: " + p.getFechaPrestamo();
+                    cmbLibros.addItem(item);
+                    count++;
+                }
+            }
+            
+            if (count == 0) {
+                cmbLibros.removeAllItems();
+                cmbLibros.addItem("-- Usuario sin préstamos activos --");
+            }
+            
+            System.out.println("✓ Cargados " + count + " préstamos activos del usuario");
+            
+        } catch (Exception e) {
+            System.err.println("✗ Error al cargar libros prestados: " + e.getMessage());
+            e.printStackTrace();
+            cmbLibros.removeAllItems();
+            cmbLibros.addItem("-- Error al cargar libros --");
+        }
+    }
+    
+/**
+     * Devolver libro
+     */
+    private void devolverLibro() {
+        // Verificar índices
+        if (cmbUsuarios.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this,
+                "⚠ Por favor seleccione un usuario de la lista",
+                "Usuario No Seleccionado",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        if (cmbLibros.getSelectedIndex() <= 0) {
+            JOptionPane.showMessageDialog(this,
+                "⚠ Por favor seleccione un libro de la lista",
+                "Libro No Seleccionado",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String libroSeleccionado = (String) cmbLibros.getSelectedItem();
+        
+        // Verificar que no sea mensaje de error
+        if (libroSeleccionado.contains("sin préstamos") || libroSeleccionado.contains("Error")) {
+            JOptionPane.showMessageDialog(this,
+                "⚠ No hay préstamos activos para devolver",
+                "Sin Préstamos",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        try {
+            // Extraer ID del préstamo (formato: "ID | Libro: ...")
+            int idPrestamo = Integer.parseInt(libroSeleccionado.split(" \\| ")[0].trim());
+            
+            // Buscar el préstamo
+            Prestamo prestamo = prestamoDAO.buscarPorId(idPrestamo);
+            
+            if (prestamo == null) {
+                JOptionPane.showMessageDialog(this,
+                    "❌ Préstamo no encontrado",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Verificar que esté activo
+            if (!"ACTIVO".equals(prestamo.getEstado())) {
+                JOptionPane.showMessageDialog(this,
+                    "⚠ Este préstamo ya fue devuelto",
+                    "Préstamo Ya Devuelto",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            // Calcular días de retraso
+            LocalDate hoy = LocalDate.now();
+            LocalDate fechaEsperada = prestamo.getFechaDevolucionEsperada();
+            long diasRetraso = ChronoUnit.DAYS.between(fechaEsperada, hoy);
+            
+            String estadoNuevo;
+            if (diasRetraso > 0) {
+                estadoNuevo = "DEVUELTO_TARDE";
+            } else {
+                estadoNuevo = "DEVUELTO";
+            }
+            
+            // Actualizar préstamo
+            prestamo.setFechaDevolucionReal(hoy);
+            prestamo.setEstado(estadoNuevo);
+            
+            boolean exito = prestamoDAO.actualizar(prestamo);
+            
+            if (exito) {
+                // Actualizar disponibilidad del libro
+                Libro libro = prestamo.getLibro();
+                int nuevaDisponibilidad = libro.getCantidadDisponible() + 1;
+                libroDAO.actualizarDisponibilidad(libro.getIdLibro(), nuevaDisponibilidad);
+                
+                // Mensaje de éxito
+                String mensaje = "✓ DEVOLUCIÓN REALIZADA EXITOSAMENTE\n\n" +
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                    "📚 LIBRO: " + libro.getTitulo() + "\n" +
+                    "   Autor: " + libro.getAutor() + "\n\n" +
+                    "👤 USUARIO: " + prestamo.getUsuario().getNombre() + " " + 
+                                     prestamo.getUsuario().getApellido() + "\n\n" +
+                    "📅 Fecha Préstamo: " + prestamo.getFechaPrestamo() + "\n" +
+                    "📅 Fecha Devolución Esperada: " + fechaEsperada + "\n" +
+                    "📅 Fecha Devolución Real: " + hoy + "\n\n";
+                
+                if (diasRetraso > 0) {
+                    mensaje += "⚠ RETRASO: " + diasRetraso + " día(s)\n" +
+                              "Estado: DEVUELTO CON RETRASO";
+                } else {
+                    mensaje += "✓ ENTREGADO A TIEMPO\n" +
+                              "Estado: DEVUELTO";
+                }
+                
+                mensaje += "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+                
+                JOptionPane.showMessageDialog(this,
+                    mensaje,
+                    "Devolución Exitosa",
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                // Limpiar y recargar
+                limpiarCampos();
+                
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "❌ Error al registrar la devolución",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+            
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "❌ Error al procesar la devolución: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+ /**
+     * Limpiar campos
+     */
+    private void limpiarCampos() {
+        cmbUsuarios.setSelectedIndex(0);
+        cmbLibros.removeAllItems();
+        cmbLibros.addItem("-- Primero seleccione un usuario --");
+    }
+
   
-}
-    
-/**
- * Devolver un libro
- */
-private void devolverLibro() {
-    // Obtener datos
-    String folioUsuarioStr = respuesta5.getText().trim();
-    String libroIdStr = respuesta6.getText().trim();
-    
-    // Validar campos vacíos
-    if (folioUsuarioStr.isEmpty() || libroIdStr.isEmpty()) {
-        JOptionPane.showMessageDialog(this,
-            "⚠ Por favor complete todos los campos\n\n" +
-            "- Folio Usuario (ID del usuario)\n" +
-            "- Libro ID (ID del libro a devolver)",
-            "Campos Vacíos",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    // Convertir a números
-    int idUsuario;
-    int idLibro;
-    
-    try {
-        idUsuario = Integer.parseInt(folioUsuarioStr);
-        idLibro = Integer.parseInt(libroIdStr);
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this,
-            "⚠ Los IDs deben ser números válidos\n\n" +
-            "Por favor verifique que ingresó valores numéricos.",
-            "Error de Formato",
-            JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    // Obtener préstamos activos del usuario
-    List<Prestamo> prestamos = prestamoDAO.obtenerPorUsuario(idUsuario);
-    
-    if (prestamos.isEmpty()) {
-        JOptionPane.showMessageDialog(this,
-            "⚠ El usuario no tiene préstamos registrados\n\n" +
-            "Folio Usuario: " + idUsuario,
-            "Sin Préstamos",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    // Buscar el préstamo activo de ese libro
-    Prestamo prestamoActivo = null;
-    for (Prestamo p : prestamos) {
-        if (p.getLibro().getIdLibro() == idLibro && "ACTIVO".equals(p.getEstado())) {
-            prestamoActivo = p;
-            break;
-        }
-    }
-    
-    if (prestamoActivo == null) {
-        JOptionPane.showMessageDialog(this,
-            "⚠ No se encontró un préstamo activo\n\n" +
-            "El usuario no tiene un préstamo activo del libro con ID: " + idLibro + "\n\n" +
-            "Verifique:\n" +
-            "• Que el usuario tenga el libro prestado\n" +
-            "• Que el préstamo no haya sido devuelto ya\n" +
-            "• Que los IDs sean correctos",
-            "Préstamo No Encontrado",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    // Devolver el libro
-    boolean exito = prestamoDAO.devolver(prestamoActivo.getIdPrestamo());
-    
-    if (exito) {
-        // Actualizar disponibilidad
-        Libro libro = prestamoActivo.getLibro();
-        int nuevaDisponibilidad = libro.getCantidadDisponible() + 1;
-        libroDAO.actualizarDisponibilidad(idLibro, nuevaDisponibilidad);
-        
-        // Calcular si hubo retraso
-        java.time.LocalDate hoy = java.time.LocalDate.now();
-        boolean conRetraso = hoy.isAfter(prestamoActivo.getFechaDevolucionEsperada());
-        long diasRetraso = 0;
-        
-        if (conRetraso) {
-            diasRetraso = java.time.temporal.ChronoUnit.DAYS.between(
-                prestamoActivo.getFechaDevolucionEsperada(), hoy);
-        }
-        
-        // Mensaje de éxito
-        String mensajeRetraso = "";
-        if (conRetraso) {
-            mensajeRetraso = "\n⚠ DEVOLUCIÓN CON RETRASO: " + diasRetraso + " día(s)\n";
-        }
-        
-        JOptionPane.showMessageDialog(this,
-            "✓ LIBRO DEVUELTO EXITOSAMENTE\n\n" +
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-            "📚 LIBRO:\n" +
-            "   • " + libro.getTitulo() + "\n" +
-            "   • Autor: " + libro.getAutor() + "\n\n" +
-            "👤 USUARIO:\n" +
-            "   • " + prestamoActivo.getUsuario().getNombre() + " " + 
-                     prestamoActivo.getUsuario().getApellido() + "\n\n" +
-            "📅 FECHAS:\n" +
-            "   • Préstamo: " + prestamoActivo.getFechaPrestamo() + "\n" +
-            "   • Esperada: " + prestamoActivo.getFechaDevolucionEsperada() + "\n" +
-            "   • Devolución: " + hoy + "\n" +
-            mensajeRetraso +
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-            "Devolución Exitosa",
-            JOptionPane.INFORMATION_MESSAGE);
-        
-        // Limpiar campos
-        limpiarCampos();
-        
-    } else {
-        JOptionPane.showMessageDialog(this,
-            "❌ Error al devolver el libro\n\n" +
-            "No se pudo actualizar el préstamo en la base de datos.\n" +
-            "Por favor intente nuevamente.",
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-    }
-}
-
-/**
- * Limpiar campos del formulario
- */
-private void limpiarCampos() {
-    respuesta5.setText("");
-    respuesta6.setText("");
-    respuesta5.requestFocus();
-}
-
-/**
- * Ver préstamos activos de un usuario
- */
-private void verPrestamosUsuario() {
-    String folioStr = respuesta5.getText().trim();
-    
-    if (folioStr.isEmpty()) {
-        JOptionPane.showMessageDialog(this,
-            "Ingrese un Folio Usuario para consultar",
-            "Campo Vacío",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    try {
-        int idUsuario = Integer.parseInt(folioStr);
-        List<Prestamo> prestamos = prestamoDAO.obtenerPorUsuario(idUsuario);
-        
-        // Filtrar solo activos
-        List<Prestamo> activos = new java.util.ArrayList<>();
-        for (Prestamo p : prestamos) {
-            if ("ACTIVO".equals(p.getEstado())) {
-                activos.add(p);
-            }
-        }
-        
-        if (activos.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "El usuario no tiene préstamos activos",
-                "Sin Préstamos Activos",
-                JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            StringBuilder mensaje = new StringBuilder();
-            mensaje.append("PRÉSTAMOS ACTIVOS:\n\n");
-            
-            for (Prestamo p : activos) {
-                mensaje.append("━━━━━━━━━━━━━━━━━━\n");
-                mensaje.append("Libro ID: ").append(p.getLibro().getIdLibro()).append("\n");
-                mensaje.append("Título: ").append(p.getLibro().getTitulo()).append("\n");
-                mensaje.append("Fecha préstamo: ").append(p.getFechaPrestamo()).append("\n");
-                mensaje.append("Fecha devolución: ").append(p.getFechaDevolucionEsperada()).append("\n\n");
-            }
-            
-            JOptionPane.showMessageDialog(this,
-                mensaje.toString(),
-                "Préstamos Activos del Usuario",
-                JOptionPane.INFORMATION_MESSAGE);
-        }
-        
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this,
-            "El Folio Usuario debe ser un número",
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-    }
-}  
     
     @SuppressWarnings("unchecked")
+    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -236,11 +259,11 @@ private void verPrestamosUsuario() {
         foto2 = new javax.swing.JLabel();
         texto3 = new javax.swing.JLabel();
         texto4 = new javax.swing.JLabel();
-        respuesta5 = new javax.swing.JTextField();
-        respuesta6 = new javax.swing.JTextField();
         devolvers = new javax.swing.JButton();
         paleta1 = new javax.swing.JLabel();
         titulo4 = new javax.swing.JLabel();
+        cmbLibros = new javax.swing.JComboBox<>();
+        cmbUsuarios = new javax.swing.JComboBox<>();
 
         setPreferredSize(new java.awt.Dimension(706, 457));
 
@@ -261,20 +284,13 @@ private void verPrestamosUsuario() {
         texto3.setBackground(new java.awt.Color(0, 51, 102));
         texto3.setFont(new java.awt.Font("STZhongsong", 0, 18)); // NOI18N
         texto3.setForeground(new java.awt.Color(0, 51, 102));
-        texto3.setText("Folio Usuario:");
+        texto3.setText("Usuario:");
         bg.add(texto3, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 150, 190, 45));
 
         texto4.setFont(new java.awt.Font("STZhongsong", 0, 18)); // NOI18N
         texto4.setForeground(new java.awt.Color(0, 51, 102));
-        texto4.setText("Libro ID:");
+        texto4.setText("Libro Prestado:");
         bg.add(texto4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 250, 158, 48));
-
-        respuesta5.setFont(new java.awt.Font("STZhongsong", 0, 14)); // NOI18N
-        respuesta5.addActionListener(this::respuesta5ActionPerformed);
-        bg.add(respuesta5, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 240, 40));
-
-        respuesta6.addActionListener(this::respuesta6ActionPerformed);
-        bg.add(respuesta6, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 300, 240, 40));
 
         devolvers.setBackground(new java.awt.Color(0, 51, 102));
         devolvers.setFont(new java.awt.Font("Segoe UI Semibold", 1, 18)); // NOI18N
@@ -298,6 +314,13 @@ private void verPrestamosUsuario() {
         titulo4.setText("Panel Devolución");
         bg.add(titulo4, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 90, 260, 40));
 
+        cmbLibros.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        bg.add(cmbLibros, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 300, 240, 40));
+
+        cmbUsuarios.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbUsuarios.addActionListener(this::cmbUsuariosActionPerformed);
+        bg.add(cmbUsuarios, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 240, 40));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -310,27 +333,23 @@ private void verPrestamosUsuario() {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void respuesta5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_respuesta5ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_respuesta5ActionPerformed
-
-    private void respuesta6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_respuesta6ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_respuesta6ActionPerformed
-
     private void devolversActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_devolversActionPerformed
         devolverLibro();
     }//GEN-LAST:event_devolversActionPerformed
 
+    private void cmbUsuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbUsuariosActionPerformed
+        cargarLibrosPrestados();
+    }//GEN-LAST:event_cmbUsuariosActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bg;
+    private javax.swing.JComboBox<String> cmbLibros;
+    private javax.swing.JComboBox<String> cmbUsuarios;
     private javax.swing.JButton devolvers;
     private javax.swing.JLabel foto2;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel paleta1;
-    private javax.swing.JTextField respuesta5;
-    private javax.swing.JTextField respuesta6;
     private javax.swing.JLabel texto3;
     private javax.swing.JLabel texto4;
     private javax.swing.JLabel titulo4;

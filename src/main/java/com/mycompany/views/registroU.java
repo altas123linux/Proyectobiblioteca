@@ -148,6 +148,8 @@ imagen2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         bg.add(txtNombre1, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 110, 160, -1));
         bg.add(txtNombre2, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 160, 160, -1));
         bg.add(txtNombre3, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 240, 160, -1));
+
+        txtNombre4.addActionListener(this::txtNombre4ActionPerformed);
         bg.add(txtNombre4, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 70, 160, -1));
         bg.add(txtNombre5, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 370, 160, -1));
         bg.add(txtNombre6, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 200, 160, -1));
@@ -182,6 +184,10 @@ imagen2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
       
       
     }//GEN-LAST:event_btnRegistrarActionPerformed
+
+    private void txtNombre4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombre4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNombre4ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

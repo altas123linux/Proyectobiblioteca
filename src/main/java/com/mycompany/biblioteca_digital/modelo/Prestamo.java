@@ -13,9 +13,15 @@ public class Prestamo{
     private LocalDate fechaDevolucionReal;
     private String estado; 
     
-    public Prestamo(Usuario usuario1, Libro libro1) {
-        this.estado = "ACTIVO";
-    }
+    // Constructor vacío
+    public Prestamo() {
+    this.estado = "ACTIVO";
+}
+    public Prestamo(Usuario usuario, Libro libro) {
+    this.usuario = usuario;
+    this.libro = libro;
+    this.estado = "ACTIVO";
+}
     
     public Prestamo(Usuario usuario, Libro libro, LocalDate fechaPrestamo, int diasPrestamo) {
         this.usuario = usuario;

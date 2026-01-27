@@ -199,7 +199,9 @@ try {
     
     // Crear el préstamo
     Usuario usuario = (Usuario) persona;
-    Prestamo prestamo = new Prestamo(usuario, libro);
+    Prestamo prestamo = new Prestamo();
+    prestamo.setUsuario(usuario);
+    prestamo.setLibro(libro);
     prestamo.setFechaPrestamo(LocalDate.now());
     prestamo.setFechaDevolucionEsperada(LocalDate.now().plusDays(7)); // 7 días
     prestamo.setEstado("ACTIVO");

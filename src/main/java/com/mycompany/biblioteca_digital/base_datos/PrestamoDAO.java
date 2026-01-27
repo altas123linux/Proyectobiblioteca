@@ -17,7 +17,7 @@ public class PrestamoDAO {
      * Crear un nuevo préstamo
      */
     public boolean insertar(Prestamo prestamo) {
-        String sql = "INSERT INTO prestamos (id_persona, id_libro, fecha_prestamo, " +
+        String sql = "INSERT INTO prestamos (id_usuario, id_libro, fecha_prestamo, " +
                      "fecha_devolucion_esperada, estado) VALUES (?, ?, ?, ?, ?)";
         
         Connection conn = null;
@@ -54,6 +54,97 @@ public class PrestamoDAO {
             }
         }
     }
+    /**
+ * Buscar préstamo por ID
+ */
+public Prestamo buscarPorId(int idPrestamo) {
+    String sql = "SELECT p.*, " +
+                 "per.id_persona, per.cedula, per.nombre, per.apellido, per.mail, " +
+                 "l.id_libro, l.isbn, l.titulo, l.autor, l.editorial " +
+                 "FROM prestamos p " +
+                 "INNER JOIN personas per ON p.id_usuario = per.id_persona " +  // ✅ CORRECTO
+                 "INNER JOIN libros l ON p.id_libro = l.id_libro " +
+                 "WHERE p.id_prestamo = ?";
+    
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+    
+    try {
+        conn = ConexionBD.obtenerConexion();
+        stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, idPrestamo);
+        
+        rs = stmt.executeQuery();
+        
+        if (rs.next()) {
+            return crearPrestamoDesdeResultSet(rs);
+        }
+        
+        return null;
+        
+    } catch (SQLException e) {
+        System.err.println("✗ Error al buscar préstamo por ID: " + e.getMessage());
+        e.printStackTrace();
+        return null;
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            System.err.println("Error al cerrar recursos: " + e.getMessage());
+        }
+    }
+}
+/**
+ * Actualizar un préstamo existente
+ */
+public boolean actualizar(Prestamo prestamo) {
+    String sql = "UPDATE prestamos SET " +
+                 "fecha_devolucion_real = ?, " +
+                 "estado = ? " +
+                 "WHERE id_prestamo = ?";
+    
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    
+    try {
+        conn = ConexionBD.obtenerConexion();
+        stmt = conn.prepareStatement(sql);
+        
+        // Convertir LocalDate a java.sql.Date
+        if (prestamo.getFechaDevolucionReal() != null) {
+            stmt.setDate(1, java.sql.Date.valueOf(prestamo.getFechaDevolucionReal()));
+        } else {
+            stmt.setNull(1, java.sql.Types.DATE);
+        }
+        
+        stmt.setString(2, prestamo.getEstado());
+        stmt.setInt(3, prestamo.getIdPrestamo());
+        
+        int filasAfectadas = stmt.executeUpdate();
+        
+        if (filasAfectadas > 0) {
+            System.out.println("✓ Préstamo actualizado: ID " + prestamo.getIdPrestamo());
+            return true;
+        }
+        
+        return false;
+        
+    } catch (SQLException e) {
+        System.err.println("✗ Error al actualizar préstamo: " + e.getMessage());
+        e.printStackTrace();
+        return false;
+    } finally {
+        try {
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            System.err.println("Error al cerrar recursos: " + e.getMessage());
+        }
+    }
+}
     
     /**
      * Obtener préstamos de un usuario específico
@@ -62,9 +153,9 @@ public class PrestamoDAO {
         List<Prestamo> prestamos = new ArrayList<>();
         String sql = "SELECT p.*, per.nombre, per.apellido, l.titulo, l.autor " +
                      "FROM prestamos p " +
-                     "INNER JOIN personas per ON p.id_persona = per.id_persona " +
+                     "INNER JOIN personas per ON p.id_usuario = per.id_persona " +
                      "INNER JOIN libros l ON p.id_libro = l.id_libro " +
-                     "WHERE p.id_persona = ? " +
+                     "WHERE p.id_usuario = ? " +
                      "ORDER BY p.fecha_prestamo DESC";
         
         Connection conn = null;
@@ -105,7 +196,7 @@ public class PrestamoDAO {
         String sql = "SELECT p.*, per.nombre, per.apellido, per.cedula, " +
                      "l.titulo, l.autor, l.isbn " +
                      "FROM prestamos p " +
-                     "INNER JOIN personas per ON p.id_persona = per.id_persona " +
+                     "INNER JOIN personas per ON p.id_usuario = per.id_persona " +
                      "INNER JOIN libros l ON p.id_libro = l.id_libro " +
                      "WHERE p.estado = 'ACTIVO' " +
                      "ORDER BY p.fecha_prestamo DESC";
@@ -148,7 +239,7 @@ public class PrestamoDAO {
         String sql = "SELECT p.*, per.nombre, per.apellido, per.cedula, " +
                      "l.titulo, l.autor, l.isbn " +
                      "FROM prestamos p " +
-                     "INNER JOIN personas per ON p.id_persona = per.id_persona " +
+                     "INNER JOIN personas per ON p.id_usuario = per.id_persona " +
                      "INNER JOIN libros l ON p.id_libro = l.id_libro " +
                      "WHERE p.estado = 'ACTIVO' AND p.fecha_devolucion_esperada < CURDATE() " +
                      "ORDER BY p.fecha_devolucion_esperada ASC";
@@ -187,43 +278,44 @@ public class PrestamoDAO {
      * Obtener todos los préstamos (historial completo)
      */
     public List<Prestamo> obtenerTodos() {
-        List<Prestamo> prestamos = new ArrayList<>();
-        String sql = "SELECT p.*, per.nombre, per.apellido, per.cedula, " +
-                     "l.titulo, l.autor, l.isbn " +
-                     "FROM prestamos p " +
-                     "INNER JOIN personas per ON p.id_persona = per.id_persona " +
-                     "INNER JOIN libros l ON p.id_libro = l.id_libro " +
-                     "ORDER BY p.fecha_prestamo DESC";
+    List<Prestamo> prestamos = new ArrayList<>();
+    String sql = "SELECT p.*, per.nombre, per.apellido, per.cedula, " +
+                 "l.titulo, l.autor, l.isbn " +
+                 "FROM prestamos p " +
+                 "INNER JOIN personas per ON p.id_usuario = per.id_persona " +  // ✅ CORRECTO
+                 "INNER JOIN libros l ON p.id_libro = l.id_libro " +
+                 "ORDER BY p.fecha_prestamo DESC";
+    
+    Connection conn = null;
+    Statement stmt = null;
+    ResultSet rs = null;
+    
+    try {
+        conn = ConexionBD.obtenerConexion();
+        stmt = conn.createStatement();
+        rs = stmt.executeQuery(sql);
         
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = ConexionBD.obtenerConexion();
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            
-            while (rs.next()) {
-                prestamos.add(crearPrestamoDesdeResultSet(rs));
-            }
-            
-            System.out.println("✓ Se obtuvieron " + prestamos.size() + " préstamos");
-            
-        } catch (SQLException e) {
-            System.err.println("✗ Error al obtener todos los préstamos: " + e.getMessage());
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                System.err.println("Error al cerrar recursos: " + e.getMessage());
-            }
+        while (rs.next()) {
+            prestamos.add(crearPrestamoDesdeResultSet(rs));
         }
         
-        return prestamos;
+        System.out.println("✓ Se obtuvieron " + prestamos.size() + " préstamos");
+        
+    } catch (SQLException e) {
+        System.err.println("✗ Error al obtener todos los préstamos: " + e.getMessage());
+        e.printStackTrace();
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (stmt != null) stmt.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            System.err.println("Error al cerrar recursos: " + e.getMessage());
+        }
     }
+    
+    return prestamos;
+}
     
     /**
      * Devolver un libro (marcar préstamo como DEVUELTO)
@@ -294,42 +386,53 @@ public class PrestamoDAO {
     }
     
     /**
-     * Crear objeto Prestamo desde un ResultSet
-     */
-    private Prestamo crearPrestamoDesdeResultSet(ResultSet rs) throws SQLException {
-        // Crear Usuario
-        Usuario usuario = new Usuario();
+ * Crear objeto Prestamo desde un ResultSet
+ */
+private Prestamo crearPrestamoDesdeResultSet(ResultSet rs) throws SQLException {
+    // Crear Usuario
+    Usuario usuario = new Usuario();
+    // Leer id_usuario de la tabla prestamos (columna del JOIN)
+    if (columnExists(rs, "id_usuario")) {
+        usuario.setIdPersona(rs.getInt("id_usuario"));
+    } else if (columnExists(rs, "id_persona")) {
         usuario.setIdPersona(rs.getInt("id_persona"));
-        usuario.setNombre(rs.getString("nombre"));
-        usuario.setApellido(rs.getString("apellido"));
-        if (columnExists(rs, "cedula")) {
-            usuario.setCedula(rs.getString("cedula"));
-        }
-        
-        // Crear Libro
-        Libro libro = new Libro();
-        libro.setIdLibro(rs.getInt("id_libro"));
-        libro.setTitulo(rs.getString("titulo"));
-        libro.setAutor(rs.getString("autor"));
-        if (columnExists(rs, "isbn")) {
-            libro.setIsbn(rs.getString("isbn"));
-        }
-        
-        // Crear Préstamo
-        Prestamo prestamo = new Prestamo(usuario, libro);
-        prestamo.setIdPrestamo(rs.getInt("id_prestamo"));
-        prestamo.setFechaPrestamo(rs.getDate("fecha_prestamo").toLocalDate());
-        prestamo.setFechaDevolucionEsperada(rs.getDate("fecha_devolucion_esperada").toLocalDate());
-        
-        Date fechaDevReal = rs.getDate("fecha_devolucion_real");
-        if (fechaDevReal != null) {
-            prestamo.setFechaDevolucionReal(fechaDevReal.toLocalDate());
-        }
-        
-        prestamo.setEstado(rs.getString("estado"));
-        
-        return prestamo;
     }
+    
+    usuario.setNombre(rs.getString("nombre"));
+    usuario.setApellido(rs.getString("apellido"));
+    if (columnExists(rs, "cedula")) {
+        usuario.setCedula(rs.getString("cedula"));
+    }
+    
+    // Crear Libro
+    Libro libro = new Libro();
+    libro.setIdLibro(rs.getInt("id_libro"));
+    libro.setTitulo(rs.getString("titulo"));
+    libro.setAutor(rs.getString("autor"));
+    if (columnExists(rs, "isbn")) {
+        libro.setIsbn(rs.getString("isbn"));
+    }
+    if (columnExists(rs, "editorial")) {
+        libro.setEditorial(rs.getString("editorial"));
+    }
+    
+    // Crear Préstamo
+    Prestamo prestamo = new Prestamo();
+    prestamo.setUsuario(usuario);
+    prestamo.setLibro(libro);
+    prestamo.setIdPrestamo(rs.getInt("id_prestamo"));
+    prestamo.setFechaPrestamo(rs.getDate("fecha_prestamo").toLocalDate());
+    prestamo.setFechaDevolucionEsperada(rs.getDate("fecha_devolucion_esperada").toLocalDate());
+    
+    Date fechaDevReal = rs.getDate("fecha_devolucion_real");
+    if (fechaDevReal != null) {
+        prestamo.setFechaDevolucionReal(fechaDevReal.toLocalDate());
+    }
+    
+    prestamo.setEstado(rs.getString("estado"));
+    
+    return prestamo;
+}
     
     /**
      * Verificar si una columna existe en el ResultSet

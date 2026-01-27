@@ -281,31 +281,34 @@ public boolean eliminar(int idPersona) {
     }
     
     /**
-     * Crear objeto Persona desde un ResultSet
-     */
-    private Persona crearPersonaDesdeResultSet(ResultSet rs) throws SQLException {
-        String tipo = rs.getString("tipo");
-        
-        Persona persona;
-        
-        if ("ADMINISTRADOR".equalsIgnoreCase(tipo)) {
-            persona = new Administrador();
-        } else {
-            persona = new Usuario();
-        }
-        
-        persona.setCedula(rs.getString("cedula"));
-        persona.setNombre(rs.getString("nombre"));
-        persona.setApellido(rs.getString("apellido"));
-        persona.setMail(rs.getString("mail"));
-        persona.setDireccion(rs.getString("direccion"));
-        
-        persona.setUsuario(rs.getString("usuario"));
-        persona.setContraseña(rs.getString("contraseña"));
-        persona.setActivo(rs.getBoolean("activo"));
-        
-        return persona;
+ * Crear objeto Persona desde un ResultSet
+ */
+private Persona crearPersonaDesdeResultSet(ResultSet rs) throws SQLException {
+    String tipo = rs.getString("tipo");
+    
+    Persona persona;
+    
+    if ("ADMINISTRADOR".equalsIgnoreCase(tipo)) {
+        persona = new Administrador();
+    } else {
+        persona = new Usuario();
     }
+    
+    // ✅ AGREGAR ESTA LÍNEA - LA MÁS IMPORTANTE
+    persona.setIdPersona(rs.getInt("id_persona"));
+    
+    persona.setCedula(rs.getString("cedula"));
+    persona.setNombre(rs.getString("nombre"));
+    persona.setApellido(rs.getString("apellido"));
+    persona.setMail(rs.getString("mail"));
+    persona.setDireccion(rs.getString("direccion"));
+    
+    persona.setUsuario(rs.getString("usuario"));
+    persona.setContraseña(rs.getString("contraseña"));
+    persona.setActivo(rs.getBoolean("activo"));
+    
+    return persona;
+}
     
     /**
      * Método de prueba
