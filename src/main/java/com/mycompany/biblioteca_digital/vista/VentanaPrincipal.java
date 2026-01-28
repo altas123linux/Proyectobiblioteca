@@ -50,11 +50,35 @@ public VentanaPrincipal() {
         InitContent(); // Carga la primera vista
     }
 
-    private void configurarInterfazUsuario() {
-        if (usuarioLogueado != null) {
-            System.out.println("Usuario logueado: " + usuarioLogueado.getNombre());
+    /**
+ * Configurar interfaz según el rol del usuario logueado
+ */
+private void configurarInterfazUsuario() {
+    if (usuarioLogueado != null) {
+        // Mostrar info del usuario en el título de la ventana
+        setTitle("Sistema Biblioteca UET - " + 
+                 usuarioLogueado.getNombre() + " " + 
+                 usuarioLogueado.getApellido() + 
+                 " [" + usuarioLogueado.getTipo() + "]");
+        
+        System.out.println("✓ Usuario logueado: " + usuarioLogueado.getNombre() + 
+                          " - Tipo: " + usuarioLogueado.getTipo());
+        
+        // Si es USUARIO normal (no administrador)
+        if ("USUARIO".equalsIgnoreCase(usuarioLogueado.getTipo())) {
+            // Ocultar panel de USUARIOS (solo admin)
+            boton3.setVisible(false);
+            
+            System.out.println("🔒 Modo Usuario: Panel de Usuarios oculto");
+            System.out.println("📊 Reportes mostrará solo préstamos del usuario");
+        } else {
+            // Es ADMINISTRADOR - mostrar todo
+            System.out.println("🔓 Modo Administrador: Acceso completo");
         }
+    } else {
+        System.err.println("⚠ No hay usuario logueado");
     }
+}
         // Esto escala el icono que ya pusiste en Propiedades al tamaño del botón
         // 1. Cargar y escalar la imagen (tu línea con un pequeño ajuste)
 private void setupIcons() {
@@ -100,16 +124,20 @@ private void setdate() {
     private void InitContent() {
         ShowJPanel(new vista1());
     }
+ 
     private void ShowJPanel(JPanel v1) {
-        v1.setSize(706, 457);
-        v1.setLocation(0, 0);
-        
-        ventana.removeAll();
-        ventana.setLayout(new BorderLayout()); // Importante para que se vea bien
-        ventana.add(v1, BorderLayout.CENTER);
-        ventana.revalidate();
-        ventana.repaint();
-    }
+    // Debug: Ver qué panel se está cargando
+    System.out.println("📄 Cargando panel: " + v1.getClass().getSimpleName());
+    
+    v1.setSize(706, 457);
+    v1.setLocation(0, 0);
+    
+    ventana.removeAll();
+    ventana.setLayout(new BorderLayout());
+    ventana.add(v1, BorderLayout.CENTER);
+    ventana.revalidate();
+    ventana.repaint();
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -381,7 +409,7 @@ private void setdate() {
 
     private void boton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton1ActionPerformed
         // TODO add your handling code here:
-                ShowJPanel(new vista2());
+                ShowJPanel(new vista2(usuarioLogueado));
 
     }//GEN-LAST:event_boton1ActionPerformed
 
@@ -393,7 +421,7 @@ private void setdate() {
 
     private void boton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton2ActionPerformed
         // TODO add your handling code here:
-                ShowJPanel(new vista4());
+                ShowJPanel(new vista4(usuarioLogueado));
 
     }//GEN-LAST:event_boton2ActionPerformed
 
@@ -411,7 +439,7 @@ private void setdate() {
 
     private void boton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton6ActionPerformed
         // TODO add your handling code here:
-                ShowJPanel(new vista6());
+                ShowJPanel(new vista6(usuarioLogueado));
 
     }//GEN-LAST:event_boton6ActionPerformed
 

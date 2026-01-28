@@ -1,61 +1,85 @@
 package com.mycompany.views;
 
-import java.awt.Image;
-import javax.swing.ImageIcon;
+
 import com.mycompany.biblioteca_digital.base_datos.PrestamoDAO;
 import com.mycompany.biblioteca_digital.modelo.Prestamo;
+import com.mycompany.biblioteca_digital.modelo.Persona;
 import java.util.List;
+import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import java.time.format.DateTimeFormatter;
 
 public class vista6 extends javax.swing.JPanel {
-
+    
     private PrestamoDAO prestamoDAO;
     private DefaultTableModel modeloTabla;
     private DateTimeFormatter formatoFecha;
+    private Persona usuarioLogueado; 
     
-    public vista6() {
+/**
+     * Constructor que recibe el usuario logueado
+     */
+    public vista6(Persona usuario) {
+        this.usuarioLogueado = usuario;
         initComponents();
         inicializar();
-}
-
+        configurarSegunRol();
+    }
+    
+    /**
+     * Constructor vacío (para compatibilidad)
+     */
+    public vista6() {
+        this(null);
+    }
 /**
  * Inicializar componentes personalizados
  */
 private void inicializar() {
-    prestamoDAO = new PrestamoDAO();
-    formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    configurarTabla();
-    cargarReportes();
-    
-jTable3.setFocusable(false);
-jTable3.setCellSelectionEnabled(false); // Opcional, si no necesitas seleccionar celdas individuales
+        prestamoDAO = new PrestamoDAO();
+        formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        configurarTabla();
+        cargarReportes();
         
+        jTable3.setFocusable(false);
+        jTable3.setCellSelectionEnabled(false);
 
-boton12.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/actualizar"
-        + ".png")).getImage().getScaledInstance(100, 70, java.awt.Image.SCALE_SMOOTH)));
-
-// 2. Forzar el centrado horizontal dentro del espacio del Label
-boton12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-margen.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/margen1"
-        + ".png")).getImage().getScaledInstance(500, 250, java.awt.Image.SCALE_SMOOTH)));
-
-// 2. Forzar el centrado horizontal dentro del espacio del Label
-margen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-}
+        boton12.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/actualizar.png")).getImage().getScaledInstance(100, 70, java.awt.Image.SCALE_SMOOTH)));
+        boton12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        
+        margen.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/margen1.png")).getImage().getScaledInstance(500, 250, java.awt.Image.SCALE_SMOOTH)));
+        margen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    }
     
+/**
+     * Configurar interfaz según el rol del usuario
+     */
+    private void configurarSegunRol() {
+        if (usuarioLogueado == null) {
+            System.err.println("⚠ No hay usuario logueado en reportes");
+            return;
+        }
+        
+        if ("USUARIO".equalsIgnoreCase(usuarioLogueado.getTipo())) {
+            System.out.println("🔒 Reportes - Modo Usuario: " + usuarioLogueado.getNombre());
+            titulo4.setText("Mis Préstamos");
+        } else {
+            System.out.println("🔓 Reportes - Modo Administrador: Reportes globales");
+            titulo4.setText("Panel Reportes");
+        }
+    }
   /**
  * Configurar columnas de la tabla
  */
-private void configurarTabla() {
-    String[] columnas = {"ID", "Usuario", "Cédula", "Libro", "ISBN", 
-                        "Fecha Préstamo", "Fecha Esperada", "Fecha Real", "Estado"};
-    modeloTabla = new DefaultTableModel(columnas, 0) {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-    };
+ private void configurarTabla() {
+        String[] columnas = {"ID", "Usuario", "Cédula", "Libro", "ISBN", 
+                            "Fecha Préstamo", "Fecha Esperada", "Fecha Real", "Estado"};
+        modeloTabla = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
     
     jTable3.setModel(modeloTabla);
     
@@ -71,130 +95,166 @@ private void configurarTabla() {
     jTable3.getColumnModel().getColumn(8).setPreferredWidth(100); // Estado
 }
 
-/**
- * Cargar todos los préstamos (historial completo)
- */
-private void cargarReportes() {
-    modeloTabla.setRowCount(0);
-    
-    List<Prestamo> prestamos = prestamoDAO.obtenerTodos();
-    
-    for (Prestamo prestamo : prestamos) {
-        String nombreUsuario = prestamo.getUsuario().getNombre() + " " + 
-                              prestamo.getUsuario().getApellido();
+ /**
+     * Cargar todos los préstamos según el rol
+     */
+    private void cargarReportes() {
+        modeloTabla.setRowCount(0);
         
-        String fechaPrestamo = prestamo.getFechaPrestamo().format(formatoFecha);
-        String fechaEsperada = prestamo.getFechaDevolucionEsperada().format(formatoFecha);
+        List<Prestamo> prestamos;
         
-        String fechaReal = "-";
-        if (prestamo.getFechaDevolucionReal() != null) {
-            fechaReal = prestamo.getFechaDevolucionReal().format(formatoFecha);
+        if (usuarioLogueado != null && "USUARIO".equalsIgnoreCase(usuarioLogueado.getTipo())) {
+            // MODO USUARIO: Solo sus préstamos
+            prestamos = prestamoDAO.obtenerPorUsuario(usuarioLogueado.getIdPersona());
+            System.out.println("📊 Mostrando préstamos del usuario: " + usuarioLogueado.getNombre());
+            
+        } else {
+            // MODO ADMIN: Todos los préstamos
+            prestamos = prestamoDAO.obtenerTodos();
+            System.out.println("📊 Mostrando todos los préstamos del sistema");
         }
         
-        // Determinar estado
-        String estado = prestamo.getEstado();
-        if ("ACTIVO".equals(estado) && 
-            prestamo.getFechaDevolucionEsperada().isBefore(java.time.LocalDate.now())) {
-            estado = "VENCIDO";
-        }
-        
-        Object[] fila = {
-            prestamo.getIdPrestamo(),
-            nombreUsuario,
-            prestamo.getUsuario().getCedula(),
-            prestamo.getLibro().getTitulo(),
-            prestamo.getLibro().getIsbn(),
-            fechaPrestamo,
-            fechaEsperada,
-            fechaReal,
-            estado
-        };
-        modeloTabla.addRow(fila);
+        cargarDatosEnTabla(prestamos);
+        System.out.println("✓ Reportes cargados: " + prestamos.size() + " préstamos");
     }
     
-    System.out.println("✓ Reportes cargados: " + prestamos.size() + " préstamos");
-}
+    /**
+     * Cargar datos en la tabla
+     */
+    private void cargarDatosEnTabla(List<Prestamo> prestamos) {
+        modeloTabla.setRowCount(0);
+        
+        for (Prestamo prestamo : prestamos) {
+            String nombreUsuario = prestamo.getUsuario().getNombre() + " " + 
+                                  prestamo.getUsuario().getApellido();
+            
+            String fechaPrestamo = prestamo.getFechaPrestamo().format(formatoFecha);
+            String fechaEsperada = prestamo.getFechaDevolucionEsperada().format(formatoFecha);
+            
+            String fechaReal = "-";
+            if (prestamo.getFechaDevolucionReal() != null) {
+                fechaReal = prestamo.getFechaDevolucionReal().format(formatoFecha);
+            }
+            
+            // Determinar estado
+            String estado = prestamo.getEstado();
+            if ("ACTIVO".equals(estado) && 
+                prestamo.getFechaDevolucionEsperada().isBefore(java.time.LocalDate.now())) {
+                estado = "VENCIDO";
+            }
+            
+            Object[] fila = {
+                prestamo.getIdPrestamo(),
+                nombreUsuario,
+                prestamo.getUsuario().getCedula(),
+                prestamo.getLibro().getTitulo(),
+                prestamo.getLibro().getIsbn(),
+                fechaPrestamo,
+                fechaEsperada,
+                fechaReal,
+                estado
+            };
+            modeloTabla.addRow(fila);
+        }
+    }
 
-/**
- * Filtrar por estado
- */
-private void filtrarPorEstado(String estado) {
-    modeloTabla.setRowCount(0);
-    
-    List<Prestamo> prestamos;
-    
-    if ("TODOS".equals(estado)) {
-        prestamos = prestamoDAO.obtenerTodos();
-    } else if ("ACTIVOS".equals(estado)) {
-        prestamos = prestamoDAO.obtenerActivos();
-    } else if ("VENCIDOS".equals(estado)) {
-        prestamos = prestamoDAO.obtenerVencidos();
-    } else {
-        // Cargar todos y filtrar por DEVUELTO
-        prestamos = prestamoDAO.obtenerTodos();
-        prestamos.removeIf(p -> !"DEVUELTO".equals(p.getEstado()));
-    }
-    
-    for (Prestamo prestamo : prestamos) {
-        String nombreUsuario = prestamo.getUsuario().getNombre() + " " + 
-                              prestamo.getUsuario().getApellido();
+    /**
+     * Filtrar por estado según el rol
+     */
+    private void filtrarPorEstado(String estado) {
+        List<Prestamo> prestamos = new ArrayList<>();
         
-        String fechaPrestamo = prestamo.getFechaPrestamo().format(formatoFecha);
-        String fechaEsperada = prestamo.getFechaDevolucionEsperada().format(formatoFecha);
-        
-        String fechaReal = "-";
-        if (prestamo.getFechaDevolucionReal() != null) {
-            fechaReal = prestamo.getFechaDevolucionReal().format(formatoFecha);
+        if (usuarioLogueado != null && "USUARIO".equalsIgnoreCase(usuarioLogueado.getTipo())) {
+            // MODO USUARIO: Solo sus préstamos filtrados
+            List<Prestamo> todosPrestamos = prestamoDAO.obtenerPorUsuario(usuarioLogueado.getIdPersona());
+            
+            if ("TODOS".equals(estado)) {
+                prestamos = todosPrestamos;
+            } else if ("ACTIVOS".equals(estado)) {
+                for (Prestamo p : todosPrestamos) {
+                    if ("ACTIVO".equals(p.getEstado())) {
+                        prestamos.add(p);
+                    }
+                }
+            } else if ("DEVUELTO".equals(estado)) {
+                for (Prestamo p : todosPrestamos) {
+                    if ("DEVUELTO".equals(p.getEstado())) {
+                        prestamos.add(p);
+                    }
+                }
+            } else if ("VENCIDOS".equals(estado)) {
+                for (Prestamo p : todosPrestamos) {
+                    if ("ACTIVO".equals(p.getEstado()) && 
+                        p.getFechaDevolucionEsperada().isBefore(java.time.LocalDate.now())) {
+                        prestamos.add(p);
+                    }
+                }
+            }
+            System.out.println("📊 Mostrando préstamos " + estado + " del usuario");
+            
+        } else {
+            // MODO ADMIN: Todos los préstamos filtrados
+            if ("TODOS".equals(estado)) {
+                prestamos = prestamoDAO.obtenerTodos();
+            } else if ("ACTIVOS".equals(estado)) {
+                prestamos = prestamoDAO.obtenerActivos();
+            } else if ("VENCIDOS".equals(estado)) {
+                prestamos = prestamoDAO.obtenerVencidos();
+            } else if ("DEVUELTO".equals(estado)) {
+                List<Prestamo> todosPrestamos = prestamoDAO.obtenerTodos();
+                for (Prestamo p : todosPrestamos) {
+                    if ("DEVUELTO".equals(p.getEstado())) {
+                        prestamos.add(p);
+                    }
+                }
+            }
+            System.out.println("📊 Mostrando todos los préstamos " + estado);
         }
         
-        String estadoActual = prestamo.getEstado();
-        if ("ACTIVO".equals(estadoActual) && 
-            prestamo.getFechaDevolucionEsperada().isBefore(java.time.LocalDate.now())) {
-            estadoActual = "VENCIDO";
-        }
-        
-        Object[] fila = {
-            prestamo.getIdPrestamo(),
-            nombreUsuario,
-            prestamo.getUsuario().getCedula(),
-            prestamo.getLibro().getTitulo(),
-            prestamo.getLibro().getIsbn(),
-            fechaPrestamo,
-            fechaEsperada,
-            fechaReal,
-            estadoActual
-        };
-        modeloTabla.addRow(fila);
+        cargarDatosEnTabla(prestamos);
+        System.out.println("✓ Cargados " + prestamos.size() + " préstamos");
     }
-}
 
-/**
- * Obtener estadísticas
- */
-private String obtenerEstadisticas() {
-    List<Prestamo> prestamos = prestamoDAO.obtenerTodos();
-    
-    int totalPrestamos = prestamos.size();
-    int activos = (int) prestamos.stream()
-        .filter(p -> "ACTIVO".equals(p.getEstado()))
-        .count();
-    int devueltos = (int) prestamos.stream()
-        .filter(p -> "DEVUELTO".equals(p.getEstado()))
-        .count();
-    int vencidos = (int) prestamos.stream()
-        .filter(p -> "ACTIVO".equals(p.getEstado()) && 
-                     p.getFechaDevolucionEsperada().isBefore(java.time.LocalDate.now()))
-        .count();
-    
-    return String.format(
-        "ESTADÍSTICAS DE PRÉSTAMOS\n\n" +
-        "Total de préstamos: %d\n" +
-        "Préstamos activos: %d\n" +
-        "Préstamos devueltos: %d\n" +
-        "Préstamos vencidos: %d",
-        totalPrestamos, activos, devueltos, vencidos
-    );
-}
+    /**
+     * Obtener estadísticas según el rol
+     */
+    private String obtenerEstadisticas() {
+        List<Prestamo> prestamos;
+        String titulo;
+        
+        if (usuarioLogueado != null && "USUARIO".equalsIgnoreCase(usuarioLogueado.getTipo())) {
+            // MODO USUARIO: Solo sus estadísticas
+            prestamos = prestamoDAO.obtenerPorUsuario(usuarioLogueado.getIdPersona());
+            titulo = "MIS ESTADÍSTICAS DE PRÉSTAMOS";
+        } else {
+            // MODO ADMIN: Estadísticas globales
+            prestamos = prestamoDAO.obtenerTodos();
+            titulo = "ESTADÍSTICAS GLOBALES DE PRÉSTAMOS";
+        }
+        
+        int totalPrestamos = prestamos.size();
+        int activos = (int) prestamos.stream()
+            .filter(p -> "ACTIVO".equals(p.getEstado()))
+            .count();
+        int devueltos = (int) prestamos.stream()
+            .filter(p -> "DEVUELTO".equals(p.getEstado()))
+            .count();
+        int vencidos = (int) prestamos.stream()
+            .filter(p -> "ACTIVO".equals(p.getEstado()) && 
+                         p.getFechaDevolucionEsperada().isBefore(java.time.LocalDate.now()))
+            .count();
+        
+        return String.format(
+            "%s\n\n" +
+            "Total de préstamos: %d\n" +
+            "Préstamos activos: %d\n" +
+            "Préstamos devueltos: %d\n" +
+            "Préstamos vencidos: %d",
+            titulo, totalPrestamos, activos, devueltos, vencidos
+        );
+    }
+   
+
   
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
