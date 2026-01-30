@@ -40,19 +40,19 @@ public class PrestamoControl {
             return null;
         }
         
-        // Validación 2: Libro está disponible
+        // Validación 2: Libro esta disponible
         if (!libro.estaDisponible()) {
-            System.out.println("Error: El libro no está disponible");
+            System.out.println("Error: El libro no esta disponible");
             return null;
         }
         
-        // Validación 3: Usuario no tiene préstamos vencidos
+        // Validación 3: Usuario no tiene prestamos vencidos
         if (tienePrestamosVencidos(usuario)) {
-            System.out.println("Error: El usuario tiene préstamos vencidos");
+            System.out.println("Error: El usuario tiene prestamos vencidos");
             return null;
         }
         
-        // Crear el préstamo
+        // Crear el prestamo
         Prestamo prestamo = new Prestamo(usuario, libro, LocalDate.now(), diasPrestamo);
         prestamo.setIdPrestamo(contadorId++);
         
@@ -65,7 +65,7 @@ public class PrestamoControl {
         // Guardar préstamo
         prestamos.add(prestamo);
         
-        System.out.println("Préstamo realizado exitosamente");
+        System.out.println("Prestamo realizado exitosamente");
         System.out.println("Usuario: " + usuario.getNombre());
         System.out.println("Libro: " + libro.getTitulo());
         System.out.println("Fecha devolución esperada: " + prestamo.getFechaDevolucionEsperada());
@@ -80,7 +80,7 @@ public class PrestamoControl {
         Prestamo prestamo = buscarPrestamoPorId(idPrestamo);
         
         if (prestamo == null) {
-            System.out.println("Error: Préstamo no encontrado");
+            System.out.println("Error: Prestamo no encontrado");
             return false;
         }
         
@@ -95,13 +95,13 @@ public class PrestamoControl {
         // Calcular si hubo retraso
         if (prestamo.getDiasVencidos() > 0) {
             System.out.println("Advertencia: El libro fue devuelto con " + 
-                             prestamo.getDiasVencidos() + " días de retraso");
+                             prestamo.getDiasVencidos() + " dias de retraso");
         }
         
         System.out.println("Libro devuelto exitosamente");
         System.out.println("Usuario: " + prestamo.getUsuario().getNombre());
         System.out.println("Libro: " + prestamo.getLibro().getTitulo());
-        System.out.println("Fecha devolución: " + prestamo.getFechaDevolucionReal());
+        System.out.println("Fecha devolucion: " + prestamo.getFechaDevolucionReal());
         
         return true;
     }
@@ -236,9 +236,9 @@ public class PrestamoControl {
         int prestamosDevueltos = obtenerPrestamosDevueltos().size();
         
         return "Total de prestamos: " + totalPrestamos + "\n" +
-               "Préstamos activos: " + prestamosActivos + "\n" +
-               "Préstamos vencidos: " + prestamosVencidos + "\n" +
-               "Préstamos devueltos: " + prestamosDevueltos;
+               "Prestamos activos: " + prestamosActivos + "\n" +
+               "Prestamos vencidos: " + prestamosVencidos + "\n" +
+               "Prestamos devueltos: " + prestamosDevueltos;
     }
     
     /**

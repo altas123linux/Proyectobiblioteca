@@ -173,18 +173,28 @@ public Persona buscarPorId(int idPersona) {
  * Eliminar persona (marcar como inactivo)
  */
  public boolean eliminar(int id) {
-        String sql = "DELETE FROM personas WHERE id_persona = ?";
+        String sql = "UPDATE personas SET activo = 0 WHERE id_persona = ?";
+    
+    try (Connection conn = ConexionBD.obtenerConexion();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
         
-        try (Connection conn = ConexionBD.obtenerConexion();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setInt(1, id);
-            return pstmt.executeUpdate() > 0;
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        System.out.println("🗑️ Marcando usuario como inactivo ID: " + id);
+        
+        pstmt.setInt(1, id);
+        int filasAfectadas = pstmt.executeUpdate();
+        
+        if (filasAfectadas > 0) {
+            System.out.println("✓ Usuario marcado como inactivo");
+            return true;
         }
+        
+        return false;
+        
+    } catch (SQLException e) {
+        System.err.println("✗ Error al eliminar usuario: " + e.getMessage());
+        e.printStackTrace();
+        return false;
+    }
     }
     /**
      * Login - Validar usuario y contraseña

@@ -15,14 +15,6 @@ public class LibroOpciones {
         this.libros = new ArrayList<>();
         this.contadorId = 1;
         
-        // Crear libros de prueba
-        agregarLibro(new Libro("978-3-16-148410-0", "Cien años de soledad", 
-                               "Gabriel García Márquez", "Sudamericana", 
-                               1967, "Ficción", 5, "Estante A1"));
-        
-        agregarLibro(new Libro("978-0-7475-3269-9", "Harry Potter y la piedra filosofal", 
-                               "J.K. Rowling", "Bloomsbury", 
-                               1997, "Fantasía", 3, "Estante B2"));
     }
     
     /**

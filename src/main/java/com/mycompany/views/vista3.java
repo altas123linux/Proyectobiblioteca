@@ -143,74 +143,102 @@ private Persona obtenerUsuarioSeleccionado() {
     return personaDAO.buscarPorId(id);
 }
  private void eliminarUsuario() {
-        Persona persona = obtenerUsuarioSeleccionado();
+       
+    Persona persona = obtenerUsuarioSeleccionado();
+    
+    if (persona == null) {
+        return;
+    }
+    
+    // Verificar si es el único administrador
+    if ("ADMINISTRADOR".equalsIgnoreCase(persona.getTipo())) {
+        List<Persona> todos = personaDAO.obtenerTodos();
+        long adminActivos = todos.stream()
+            .filter(p -> "ADMINISTRADOR".equalsIgnoreCase(p.getTipo()) && p.isActivo())
+            .count();
         
-        if (persona == null) {
+        if (adminActivos <= 1) {
+            JOptionPane.showMessageDialog(this,
+                "❌ NO SE PUEDE ELIMINAR\n\n" +
+                "No puedes eliminar el único administrador activo del sistema.",
+                "Operación no permitida",
+                JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        // Verificar si es el único administrador
-        if ("ADMINISTRADOR".equalsIgnoreCase(persona.getTipo())) {
-            List<Persona> todos = personaDAO.obtenerTodos();
-            long adminActivos = todos.stream()
-                .filter(p -> "ADMINISTRADOR".equalsIgnoreCase(p.getTipo()) && p.isActivo())
-                .count();
+    }
+    
+    // Confirmar eliminación (soft delete)
+    String mensaje = String.format(
+        "¿Está seguro de que desea eliminar este usuario?\n\n" +
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+        "👤 Usuario: %s\n" +
+        "📝 Nombre: %s %s\n" +
+        "🆔 Cédula: %s\n" +
+        "👔 Tipo: %s\n" +
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+        "Esta acción marcará el usuario como INACTIVO.\n" +
+        "El usuario no podrá iniciar sesión pero sus registros\n" +
+        "permanecerán en el sistema para historial.",
+        persona.getUsuario(),
+        persona.getNombre(),
+        persona.getApellido(),
+        persona.getCedula(),
+        persona.getTipo()
+    );
+    
+    int confirmacion = JOptionPane.showConfirmDialog(this,
+        mensaje,
+        "⚠️ Confirmar Eliminación",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE);
+    
+    if (confirmacion == JOptionPane.YES_OPTION) {
+        try {
+            System.out.println("🗑️ Eliminando usuario: " + persona.getUsuario());
             
-            if (adminActivos <= 1) {
-                JOptionPane.showMessageDialog(this,
-                    "No puedes eliminar el único administrador activo del sistema.",
-                    "Operación no permitida",
-                    JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
-        
-        // Confirmar eliminación PERMANENTE
-        String mensaje = String.format(
-            "⚠️ ADVERTENCIA: Esta acción es IRREVERSIBLE ⚠️\n\n" +
-            "¿Está seguro de eliminar PERMANENTEMENTE este usuario?\n\n" +
-            "Usuario: %s\n" +
-            "Nombre: %s %s\n" +
-            "Tipo: %s\n\n" +
-            "El usuario será eliminado completamente de la base de datos.",
-            persona.getUsuario(),
-            persona.getNombre(),
-            persona.getApellido(),
-            persona.getTipo()
-        );
-        
-        int confirmacion = JOptionPane.showConfirmDialog(this,
-            mensaje,
-            "⚠️ Confirmar Eliminación Permanente",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE);
-        
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            try {
-                boolean exito = personaDAO.eliminar(persona.getIdPersona());
+            boolean exito = personaDAO.eliminar(persona.getIdPersona());
+            
+            if (exito) {
+                System.out.println("✓ Usuario eliminado exitosamente");
                 
-                if (exito) {
-                    JOptionPane.showMessageDialog(this,
-                        "Usuario eliminado permanentemente.",
-                        "Éxito",
-                        JOptionPane.INFORMATION_MESSAGE);
-                    
-                    cargarUsuarios();
-                    jTable1.clearSelection();
-                } else {
-                    JOptionPane.showMessageDialog(this,
-                        "No se pudo eliminar el usuario.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (Exception e) {
                 JOptionPane.showMessageDialog(this,
-                    "Error al eliminar: " + e.getMessage(),
+                    "✓ USUARIO ELIMINADO EXITOSAMENTE\n\n" +
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                    "El usuario '" + persona.getUsuario() + "' ha sido marcado como inactivo.\n" +
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+                    "✓ Éxito",
+                    JOptionPane.INFORMATION_MESSAGE);
+                
+                cargarUsuarios();
+                jTable1.clearSelection();
+            } else {
+                System.err.println("✗ Error: eliminar() retornó false");
+                
+                JOptionPane.showMessageDialog(this,
+                    "❌ ERROR AL ELIMINAR\n\n" +
+                    "No se pudo eliminar el usuario.\n" +
+                    "Por favor verifica la conexión a la base de datos.",
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
             }
+        } catch (Exception e) {
+            System.err.println("✗ Excepción al eliminar: " + e.getMessage());
+            e.printStackTrace();
+            
+            JOptionPane.showMessageDialog(this,
+                "❌ ERROR AL ELIMINAR\n\n" +
+                "Ocurrió un error al eliminar el usuario:\n" + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
         }
+    } else {
+        System.out.println("ℹ️ Eliminación cancelada");
     }
+}
+        
+        
+           
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
