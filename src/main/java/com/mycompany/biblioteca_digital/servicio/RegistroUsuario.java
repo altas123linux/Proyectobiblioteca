@@ -150,7 +150,7 @@ public class RegistroUsuario {
     private boolean validarDatosUsuario(Usuario usuario) {
         // Validar cédula
         if (usuario.getCedula() == null || usuario.getCedula().length() != 10) {
-            System.out.println("Error: La cédula debe tener 10 dígitos");
+            System.out.println("Error: La cédula debe tener 10 digitos");
             return false;
         }
         
@@ -168,7 +168,7 @@ public class RegistroUsuario {
         
         // Validar mail
         if (usuario.getMail() == null || !usuario.getMail().contains("@")) {
-            System.out.println("Error: El mail es inválido");
+            System.out.println("Error: El mail es invalido");
             return false;
         }
         

@@ -56,27 +56,27 @@ public VentanaPrincipal() {
 private void configurarInterfazUsuario() {
     if (usuarioLogueado != null) {
         // Mostrar info del usuario en el título de la ventana
-        setTitle("Sistema Biblioteca UET - " + 
+        setTitle("Sistema Biblioteca UET" + 
                  usuarioLogueado.getNombre() + " " + 
                  usuarioLogueado.getApellido() + 
                  " [" + usuarioLogueado.getTipo() + "]");
         
-        System.out.println("✓ Usuario logueado: " + usuarioLogueado.getNombre() + 
+        System.out.println("Usuario logueado: " + usuarioLogueado.getNombre() + 
                           " - Tipo: " + usuarioLogueado.getTipo());
         
         // Si es USUARIO normal (no administrador)
         if ("USUARIO".equalsIgnoreCase(usuarioLogueado.getTipo())) {
             // Ocultar panel de USUARIOS (solo admin)
             boton3.setVisible(false);
-            
-            System.out.println("🔒 Modo Usuario: Panel de Usuarios oculto");
-            System.out.println("📊 Reportes mostrará solo préstamos del usuario");
+             boton4.setVisible(false);
+            System.out.println("Modo Usuario: Panel de Usuarios oculto");
+            System.out.println("Reportes mostrará solo préstamos del usuario");
         } else {
             // Es ADMINISTRADOR - mostrar todo
-            System.out.println("🔓 Modo Administrador: Acceso completo");
+            System.out.println("Modo Administrador: Acceso completo");
         }
     } else {
-        System.err.println("⚠ No hay usuario logueado");
+        System.err.println("No hay usuario logueado");
     }
 }
         // Esto escala el icono que ya pusiste en Propiedades al tamaño del botón
@@ -127,7 +127,7 @@ private void setdate() {
  
     private void ShowJPanel(JPanel v1) {
     // Debug: Ver qué panel se está cargando
-    System.out.println("📄 Cargando panel: " + v1.getClass().getSimpleName());
+    System.out.println("Cargando panel: " + v1.getClass().getSimpleName());
     
     v1.setSize(706, 457);
     v1.setLocation(0, 0);
@@ -433,7 +433,24 @@ private void setdate() {
 
     private void boton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton4ActionPerformed
         // TODO add your handling code here:
-                ShowJPanel(new vista5());
+               JPanel panelLibros = new JPanel(new java.awt.CardLayout());
+    
+    // Obtener el CardLayout
+    java.awt.CardLayout cardLayout = (java.awt.CardLayout) panelLibros.getLayout();
+    
+    // Crear vista5 Y registroL con referencias al contenedor
+    vista5 panelListaLibros = new vista5(panelLibros, cardLayout);
+    registroL panelRegistroLibros = new registroL(panelLibros, cardLayout);
+    
+    // Agregar ambos paneles al CardLayout
+    panelLibros.add(panelListaLibros, "vista5");
+    panelLibros.add(panelRegistroLibros, "registroL");
+    
+    // Mostrar vista5 por defecto
+    cardLayout.show(panelLibros, "vista5");
+    
+    // Mostrar el panel contenedor
+    ShowJPanel(panelLibros);
 
     }//GEN-LAST:event_boton4ActionPerformed
 

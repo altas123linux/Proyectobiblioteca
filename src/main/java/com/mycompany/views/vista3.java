@@ -32,19 +32,10 @@ boton3.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().ge
 // 2. Forzar el centrado horizontal dentro del espacio del Label
 boton3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
-boton5.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono2.png")).getImage().getScaledInstance(80, 50, java.awt.Image.SCALE_SMOOTH)));
+botonborrar.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono4_1.png")).getImage().getScaledInstance(80, 50, java.awt.Image.SCALE_SMOOTH)));
 
 // 2. Forzar el centrado horizontal dentro del espacio del Label
-boton5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-boton6.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono3_1.png")).getImage().getScaledInstance(80, 50, java.awt.Image.SCALE_SMOOTH)));
-
-// 2. Forzar el centrado horizontal dentro del espacio del Label
-boton6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-boton7.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono4_1.png")).getImage().getScaledInstance(80, 50, java.awt.Image.SCALE_SMOOTH)));
-
-// 2. Forzar el centrado horizontal dentro del espacio del Label
-boton7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+botonborrar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 }
     /**
  * Configurar columnas de la tabla
@@ -96,7 +87,7 @@ private void cargarUsuarios() {
         modeloTabla.addRow(fila);
     }
     
-    System.out.println("✓ Usuarios cargados: " + usuarios.size());
+    System.out.println("Usuarios cargados: " + usuarios.size());
 }
 
 /**
@@ -150,8 +141,76 @@ private Persona obtenerUsuarioSeleccionado() {
     
     int id = (int) modeloTabla.getValueAt(fila, 0);
     return personaDAO.buscarPorId(id);
-
 }
+ private void eliminarUsuario() {
+        Persona persona = obtenerUsuarioSeleccionado();
+        
+        if (persona == null) {
+            return;
+        }
+        
+        // Verificar si es el único administrador
+        if ("ADMINISTRADOR".equalsIgnoreCase(persona.getTipo())) {
+            List<Persona> todos = personaDAO.obtenerTodos();
+            long adminActivos = todos.stream()
+                .filter(p -> "ADMINISTRADOR".equalsIgnoreCase(p.getTipo()) && p.isActivo())
+                .count();
+            
+            if (adminActivos <= 1) {
+                JOptionPane.showMessageDialog(this,
+                    "No puedes eliminar el único administrador activo del sistema.",
+                    "Operación no permitida",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+        
+        // Confirmar eliminación PERMANENTE
+        String mensaje = String.format(
+            "⚠️ ADVERTENCIA: Esta acción es IRREVERSIBLE ⚠️\n\n" +
+            "¿Está seguro de eliminar PERMANENTEMENTE este usuario?\n\n" +
+            "Usuario: %s\n" +
+            "Nombre: %s %s\n" +
+            "Tipo: %s\n\n" +
+            "El usuario será eliminado completamente de la base de datos.",
+            persona.getUsuario(),
+            persona.getNombre(),
+            persona.getApellido(),
+            persona.getTipo()
+        );
+        
+        int confirmacion = JOptionPane.showConfirmDialog(this,
+            mensaje,
+            "⚠️ Confirmar Eliminación Permanente",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+        
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            try {
+                boolean exito = personaDAO.eliminar(persona.getIdPersona());
+                
+                if (exito) {
+                    JOptionPane.showMessageDialog(this,
+                        "Usuario eliminado permanentemente.",
+                        "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    
+                    cargarUsuarios();
+                    jTable1.clearSelection();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                        "No se pudo eliminar el usuario.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                    "Error al eliminar: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -165,11 +224,7 @@ private Persona obtenerUsuarioSeleccionado() {
         boton3 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
-        boton5 = new javax.swing.JButton();
-        boton6 = new javax.swing.JButton();
-        boton7 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        botonborrar = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(706, 457));
@@ -260,34 +315,12 @@ private Persona obtenerUsuarioSeleccionado() {
         jSeparator1.setForeground(new java.awt.Color(0, 102, 153));
         bg.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 113, 500, 10));
 
-        boton5.setBackground(new java.awt.Color(0, 0, 0));
-        boton5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono2.png"))); // NOI18N
-        boton5.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        boton5.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        boton5.addActionListener(this::boton5ActionPerformed);
-        bg.add(boton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 360, 80, 50));
-
-        boton6.setBackground(new java.awt.Color(0, 0, 0));
-        boton6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono3_1.png"))); // NOI18N
-        boton6.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 51, 153), new java.awt.Color(0, 51, 153), new java.awt.Color(0, 51, 153), new java.awt.Color(0, 51, 153)));
-        boton6.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        boton6.addActionListener(this::boton6ActionPerformed);
-        bg.add(boton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 360, 80, 50));
-
-        boton7.setBackground(new java.awt.Color(0, 0, 0));
-        boton7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono4_1.png"))); // NOI18N
-        boton7.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0)));
-        boton7.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        boton7.addActionListener(this::boton7ActionPerformed);
-        bg.add(boton7, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 360, 80, 50));
-
-        jLabel1.setFont(new java.awt.Font("STZhongsong", 1, 18)); // NOI18N
-        jLabel1.setText("Nuevo");
-        bg.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 420, 60, 20));
-
-        jLabel2.setFont(new java.awt.Font("STZhongsong", 1, 18)); // NOI18N
-        jLabel2.setText("Editar");
-        bg.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 420, 70, 20));
+        botonborrar.setBackground(new java.awt.Color(0, 0, 0));
+        botonborrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono4_1.png"))); // NOI18N
+        botonborrar.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0)));
+        botonborrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        botonborrar.addActionListener(this::botonborrarActionPerformed);
+        bg.add(botonborrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 360, 80, 50));
 
         jLabel3.setFont(new java.awt.Font("STZhongsong", 1, 18)); // NOI18N
         jLabel3.setText("Borrar");
@@ -327,28 +360,6 @@ private Persona obtenerUsuarioSeleccionado() {
 }
     }//GEN-LAST:event_jTextField1FocusLost
 
-    private void boton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton6ActionPerformed
-         Persona persona = obtenerUsuarioSeleccionado();
-    
-    if (persona != null) {
-        JOptionPane.showMessageDialog(this,
-            "Funcionalidad de Editar Usuario\n\n" +
-            "Usuario seleccionado:\n" +
-            "Nombre: " + persona.getNombre() + " " + persona.getApellido() + "\n" +
-            "Tipo: " + persona.getTipo(),
-            "Editar Usuario",
-            JOptionPane.INFORMATION_MESSAGE);}
-    }//GEN-LAST:event_boton6ActionPerformed
-
-    private void boton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton5ActionPerformed
-         JOptionPane.showMessageDialog(this,
-        "Funcionalidad de Nuevo Usuario\n\n" +
-        "Los nuevos usuarios se registran desde la ventana de registro\n" +
-        "o puede crear un formulario administrativo aquí",
-        "Nuevo Usuario",
-        JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_boton5ActionPerformed
-
     private void jTable1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MousePressed
 // Esto hace que al tocar el panel, la tabla pierda el foco y se limpie la selección visual
 jTable1.clearSelection(); 
@@ -360,53 +371,15 @@ this.requestFocusInWindow();        // TODO add your handling code here:
     buscarUsuarios(texto);
     }//GEN-LAST:event_jTextField1KeyReleased
 
-    private void boton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton7ActionPerformed
-         Persona persona = obtenerUsuarioSeleccionado();
-    
-    if (persona == null) {
-        return;
-    }
-    
-    // Confirmar eliminación
-    int confirmacion = JOptionPane.showConfirmDialog(this,
-        "¿Está seguro de que desea eliminar este usuario?\n\n" +
-        "Usuario: " + persona.getUsuario() + "\n" +
-        "Nombre: " + persona.getNombre() + " " + persona.getApellido() + "\n" +
-        "Tipo: " + persona.getTipo() + "\n\n" +
-        "Esta acción marcará el usuario como inactivo.",
-        "Confirmar Eliminación",
-        JOptionPane.YES_NO_OPTION,
-        JOptionPane.WARNING_MESSAGE);
-    
-    if (confirmacion == JOptionPane.YES_OPTION) {
-        boolean exito = personaDAO.eliminar(persona.getIdPersona());
-        
-        if (exito) {
-            JOptionPane.showMessageDialog(this,
-                "✓ Usuario eliminado correctamente",
-                "Éxito",
-                JOptionPane.INFORMATION_MESSAGE);
-            
-            // Recargar tabla
-            cargarUsuarios();
-        } else {
-            JOptionPane.showMessageDialog(this,
-                "Error al eliminar el usuario",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    }//GEN-LAST:event_boton7ActionPerformed
+    private void botonborrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonborrarActionPerformed
+         eliminarUsuario();
+    }//GEN-LAST:event_botonborrarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bg;
     private javax.swing.JButton boton3;
-    private javax.swing.JButton boton5;
-    private javax.swing.JButton boton6;
-    private javax.swing.JButton boton7;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JButton botonborrar;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;

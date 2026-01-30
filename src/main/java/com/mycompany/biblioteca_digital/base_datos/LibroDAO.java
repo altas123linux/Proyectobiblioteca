@@ -10,51 +10,67 @@ public class LibroDAO {
     /**
      * Insertar un nuevo libro en la base de datos
      */
-    public boolean insertar(Libro libro) {
-        String sql = "INSERT INTO libros (isbn, titulo, autor, editorial, año, categoria, " +
-                     "cantidad_total, cantidad_disponible, ubicacion, activo) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            conn = ConexionBD.obtenerConexion();
-            stmt = conn.prepareStatement(sql);
-            
-            stmt.setString(1, libro.getIsbn());
-            stmt.setString(2, libro.getTitulo());
-            stmt.setString(3, libro.getAutor());
-            stmt.setString(4, libro.getEditorial());
-            stmt.setInt(5, libro.getAño());
-            stmt.setString(6, libro.getCategoria());
-            stmt.setInt(7, libro.getCantidadTotal());
-            stmt.setInt(8, libro.getCantidadDisponible());
-            stmt.setString(9, libro.getUbicacion());
-            stmt.setBoolean(10, libro.isActivo());
-            
-            int filasAfectadas = stmt.executeUpdate();
-            
-            if (filasAfectadas > 0) {
-                System.out.println("✓ Libro insertado en BD: " + libro.getTitulo());
-                return true;
-            }
-            
-            return false;
-            
-        } catch (SQLException e) {
-            System.err.println("✗ Error al insertar libro: " + e.getMessage());
-            return false;
-        } finally {
-            try {
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                System.err.println("Error al cerrar recursos: " + e.getMessage());
-            }
-        }
-    }
+  public boolean insertar(Libro libro) {
+    String sql = "INSERT INTO libros (isbn, titulo, autor, editorial, año, categoria, " +
+                 "ubicacion, cantidad_total, cantidad_disponible, activo) " +
+                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, true)";
     
+    try (Connection conn = ConexionBD.obtenerConexion();
+         PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        
+        System.out.println("📝 Insertando nuevo libro: " + libro.getTitulo());
+        
+        pstmt.setString(1, libro.getIsbn());
+        pstmt.setString(2, libro.getTitulo());
+        pstmt.setString(3, libro.getAutor());
+        pstmt.setString(4, libro.getEditorial());
+        pstmt.setInt(5, libro.getAño());
+        pstmt.setString(6, libro.getCategoria());
+        pstmt.setString(7, libro.getUbicacion());
+        pstmt.setInt(8, libro.getCantidadTotal());
+        pstmt.setInt(9, libro.getCantidadDisponible());
+        
+        int filasAfectadas = pstmt.executeUpdate();
+        
+        if (filasAfectadas > 0) {
+            // Obtener ID generado
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                libro.setIdLibro(rs.getInt(1));
+                System.out.println("✓ Libro insertado con ID: " + libro.getIdLibro());
+            }
+            return true;
+        } else {
+            System.err.println("✗ No se pudo insertar el libro");
+            return false;
+        }
+        
+    } catch (SQLException e) {
+        System.err.println("✗ Error SQL al insertar libro: " + e.getMessage());
+        e.printStackTrace();
+        return false;
+    }
+}public boolean existeISBN(String isbn) {
+    String sql = "SELECT COUNT(*) FROM libros WHERE isbn = ? AND activo = true";
+    
+    try (Connection conn = ConexionBD.obtenerConexion();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        
+        pstmt.setString(1, isbn);
+        ResultSet rs = pstmt.executeQuery();
+        
+        if (rs.next()) {
+            return rs.getInt(1) > 0;
+        }
+        
+        return false;
+        
+    } catch (SQLException e) {
+        System.err.println("✗ Error al verificar ISBN: " + e.getMessage());
+        return false;
+    }
+
+}
     /**
      * Buscar libro por ISBN
      */
@@ -79,7 +95,7 @@ public class LibroDAO {
             return null;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al buscar libro por ISBN: " + e.getMessage());
+            System.err.println("Error al buscar libro por ISBN: " + e.getMessage());
             return null;
         } finally {
             try {
@@ -116,7 +132,7 @@ public class LibroDAO {
             return null;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al buscar libro por ID: " + e.getMessage());
+            System.err.println("Error al buscar libro por ID: " + e.getMessage());
             return null;
         } finally {
             try {
@@ -152,7 +168,7 @@ public class LibroDAO {
             }
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al buscar libros por título: " + e.getMessage());
+            System.err.println("Error al buscar libros por título: " + e.getMessage());
         } finally {
             try {
                 if (rs != null) rs.close();
@@ -186,10 +202,10 @@ public class LibroDAO {
                 libros.add(crearLibroDesdeResultSet(rs));
             }
             
-            System.out.println("✓ Se obtuvieron " + libros.size() + " libros");
+            System.out.println("Se obtuvieron " + libros.size() + " libros");
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al obtener libros: " + e.getMessage());
+            System.err.println("Error al obtener libros: " + e.getMessage());
         } finally {
             try {
                 if (rs != null) rs.close();
@@ -233,14 +249,14 @@ public class LibroDAO {
             int filasAfectadas = stmt.executeUpdate();
             
             if (filasAfectadas > 0) {
-                System.out.println("✓ Libro actualizado: " + libro.getTitulo());
+                System.out.println("Libro actualizado: " + libro.getTitulo());
                 return true;
             }
             
             return false;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al actualizar libro: " + e.getMessage());
+            System.err.println("Error al actualizar libro: " + e.getMessage());
             return false;
         } finally {
             try {
@@ -271,7 +287,7 @@ public class LibroDAO {
             return filasAfectadas > 0;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al actualizar disponibilidad: " + e.getMessage());
+            System.err.println("Error al actualizar disponibilidad: " + e.getMessage());
             return false;
         } finally {
             try {
@@ -288,35 +304,29 @@ public class LibroDAO {
      */
     public boolean eliminar(int idLibro) {
         String sql = "UPDATE libros SET activo = 0 WHERE id_libro = ?";
+    
+    try (Connection conn = ConexionBD.obtenerConexion();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
         
-        Connection conn = null;
-        PreparedStatement stmt = null;
+        System.out.println("🗑️ Eliminando libro ID: " + idLibro);
         
-        try {
-            conn = ConexionBD.obtenerConexion();
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, idLibro);
-            
-            int filasAfectadas = stmt.executeUpdate();
-            
-            if (filasAfectadas > 0) {
-                System.out.println("✓ Libro eliminado (inactivo): ID " + idLibro);
-                return true;
-            }
-            
+        pstmt.setInt(1, idLibro);
+        
+        int filasAfectadas = pstmt.executeUpdate();
+        
+        if (filasAfectadas > 0) {
+            System.out.println("✓ Libro marcado como inactivo");
+            return true;
+        } else {
+            System.err.println("✗ No se encontró libro con ID: " + idLibro);
             return false;
-            
-        } catch (SQLException e) {
-            System.err.println("✗ Error al eliminar libro: " + e.getMessage());
-            return false;
-        } finally {
-            try {
-                if (stmt != null) stmt.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                System.err.println("Error al cerrar recursos: " + e.getMessage());
-            }
         }
+        
+    } catch (SQLException e) {
+        System.err.println("✗ Error SQL al eliminar: " + e.getMessage());
+        e.printStackTrace();
+        return false;
+    }
     }
     
     /**

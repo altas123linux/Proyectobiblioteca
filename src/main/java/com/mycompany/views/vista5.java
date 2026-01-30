@@ -7,46 +7,111 @@ import com.mycompany.biblioteca_digital.modelo.Libro;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import java.awt.CardLayout;
+
 
 public class vista5 extends javax.swing.JPanel {
 
     private LibroDAO libroDAO;
     private DefaultTableModel modeloTabla;
+     private JPanel panelContenedor;
+    private CardLayout cardLayout;
     
     public vista5() {
         initComponents();
-        // Inicializar DAO
-    libroDAO = new LibroDAO();
-    
-    // Configurar tabla
-    configurarTabla();
-    
-    // Cargar libros
-    cargarLibros();
-jTable2.setFocusable(false);
-jTable2.setCellSelectionEnabled(false); // Opcional, si no necesitas seleccionar celdas individuales
+     inicializar();
+    }
+    public vista5(JPanel panelContenedor, CardLayout cardLayout) {
+          initComponents();
         
+        // Guardar referencias
+        this.panelContenedor = panelContenedor;
+        this.cardLayout = cardLayout;
         
-boton8.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono.png")).getImage().getScaledInstance(120, 110, java.awt.Image.SCALE_SMOOTH)));
+        // SEGUNDO: Inicializar lógica
+        inicializar();
+    }
+    private void inicializar() {
+        System.out.println("=== INICIALIZANDO PANEL LIBROS ===");
+        
+        try {
+            // Inicializar DAO
+            libroDAO = new LibroDAO();
+            
+            // Configurar tabla
+            configurarTabla();
+            
+            // Cargar libros
+            cargarLibros();
+            
+            // Configurar tabla no editable
+            jTable2.setFocusable(false);
+            jTable2.setCellSelectionEnabled(false);
+            
+            // Configurar iconos
+            try {
+                boton8.setIcon(new javax.swing.ImageIcon(
+                    new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono.png"))
+                        .getImage().getScaledInstance(120, 110, java.awt.Image.SCALE_SMOOTH)));
+                boton8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            } catch (Exception e) {
+                System.out.println("⚠️ No se pudo cargar icono boton8");
+            }
 
-// 2. Forzar el centrado horizontal dentro del espacio del Label
-boton8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            try {
+                botonnuevo1.setIcon(new javax.swing.ImageIcon(
+                    new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono2.png"))
+                        .getImage().getScaledInstance(80, 50, java.awt.Image.SCALE_SMOOTH)));
+                botonnuevo1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            } catch (Exception e) {
+                System.out.println("⚠️ No se pudo cargar icono botonnuevo1");
+            }
 
-boton9.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono2.png")).getImage().getScaledInstance(80, 50, java.awt.Image.SCALE_SMOOTH)));
+            try {
+                botoneditar1.setIcon(new javax.swing.ImageIcon(
+                    new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono3_1.png"))
+                        .getImage().getScaledInstance(80, 50, java.awt.Image.SCALE_SMOOTH)));
+                botoneditar1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            } catch (Exception e) {
+                System.out.println("⚠️ No se pudo cargar icono botoneditar1");
+            }
+            
+            try {
+                botonborrar1.setIcon(new javax.swing.ImageIcon(
+                    new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono4_1.png"))
+                        .getImage().getScaledInstance(80, 50, java.awt.Image.SCALE_SMOOTH)));
+                botonborrar1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            } catch (Exception e) {
+                System.out.println("⚠️ No se pudo cargar icono botonborrar1");
+            }
+            
+            System.out.println("✓ Panel Libros inicializado correctamente");
+            
+        } catch (Exception e) {
+            System.err.println("✗ Error al inicializar Panel Libros: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    
+   private void configurarIconos() {
+        boton8.setIcon(new ImageIcon(
+            new ImageIcon(getClass().getResource("/imagenes/icono.png"))
+                .getImage().getScaledInstance(120, 110, Image.SCALE_SMOOTH)));
 
-// 2. Forzar el centrado horizontal dentro del espacio del Label
-boton9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        botonnuevo1.setIcon(new ImageIcon(
+            new ImageIcon(getClass().getResource("/imagenes/icono2.png"))
+                .getImage().getScaledInstance(80, 50, Image.SCALE_SMOOTH)));
 
-boton10.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono3_1.png")).getImage().getScaledInstance(80, 50, java.awt.Image.SCALE_SMOOTH)));
-
-// 2. Forzar el centrado horizontal dentro del espacio del Label
-boton10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-boton11.setIcon(new javax.swing.ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono4_1.png")).getImage().getScaledInstance(80, 50, java.awt.Image.SCALE_SMOOTH)));
-
-// 2. Forzar el centrado horizontal dentro del espacio del Label
-boton11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
-}
+        botoneditar1.setIcon(new ImageIcon(
+            new ImageIcon(getClass().getResource("/imagenes/icono3_1.png"))
+                .getImage().getScaledInstance(80, 50, Image.SCALE_SMOOTH)));
+        
+        botonborrar1.setIcon(new ImageIcon(
+            new ImageIcon(getClass().getResource("/imagenes/icono4_1.png"))
+                .getImage().getScaledInstance(80, 50, Image.SCALE_SMOOTH)));
+    }
     
   /**
  * Configurar columnas de la tabla
@@ -79,7 +144,7 @@ private void configurarTabla() {
 /**
  * Cargar todos los libros en la tabla
  */
-private void cargarLibros() {
+public void cargarLibros() {
     // Limpiar tabla
     modeloTabla.setRowCount(0);
     
@@ -161,6 +226,135 @@ private Libro obtenerLibroSeleccionado() {
     // Buscar el libro completo
     return libroDAO.buscarPorId(idLibro);
 }
+private void nuevoLibro() {
+        if (panelContenedor != null && cardLayout != null) {
+            cardLayout.show(panelContenedor, "registroL");
+        } else {
+            JOptionPane.showMessageDialog(this,
+                "No se puede abrir el formulario de registro",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }}
+        private void editarLibro() {
+        Libro libro = obtenerLibroSeleccionado();
+        if (libro == null) return;
+        
+        JPanel panel = new JPanel(new java.awt.GridLayout(8, 2, 10, 10));
+        
+        javax.swing.JTextField txtISBN = new javax.swing.JTextField(libro.getIsbn());
+        javax.swing.JTextField txtTitulo = new javax.swing.JTextField(libro.getTitulo());
+        javax.swing.JTextField txtAutor = new javax.swing.JTextField(libro.getAutor());
+        javax.swing.JTextField txtEditorial = new javax.swing.JTextField(libro.getEditorial());
+        javax.swing.JTextField txtAño = new javax.swing.JTextField(String.valueOf(libro.getAño()));
+        javax.swing.JTextField txtCategoria = new javax.swing.JTextField(libro.getCategoria());
+        javax.swing.JTextField txtUbicacion = new javax.swing.JTextField(libro.getUbicacion());
+        javax.swing.JTextField txtCantidad = new javax.swing.JTextField(String.valueOf(libro.getCantidadTotal()));
+        
+        panel.add(new javax.swing.JLabel("ISBN:"));
+        panel.add(txtISBN);
+        panel.add(new javax.swing.JLabel("Título:"));
+        panel.add(txtTitulo);
+        panel.add(new javax.swing.JLabel("Autor:"));
+        panel.add(txtAutor);
+        panel.add(new javax.swing.JLabel("Editorial:"));
+        panel.add(txtEditorial);
+        panel.add(new javax.swing.JLabel("Año:"));
+        panel.add(txtAño);
+        panel.add(new javax.swing.JLabel("Categoría:"));
+        panel.add(txtCategoria);
+        panel.add(new javax.swing.JLabel("Ubicación:"));
+        panel.add(txtUbicacion);
+        panel.add(new javax.swing.JLabel("Cantidad:"));
+        panel.add(txtCantidad);
+        
+        int resultado = JOptionPane.showConfirmDialog(this, panel, 
+            "Editar Libro", JOptionPane.OK_CANCEL_OPTION);
+        
+        if (resultado == JOptionPane.OK_OPTION) {
+            try {
+                if (txtTitulo.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "El título no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                libro.setIsbn(txtISBN.getText().trim());
+                libro.setTitulo(txtTitulo.getText().trim());
+                libro.setAutor(txtAutor.getText().trim());
+                libro.setEditorial(txtEditorial.getText().trim());
+                libro.setAño(Integer.parseInt(txtAño.getText().trim()));
+                libro.setCategoria(txtCategoria.getText().trim());
+                libro.setUbicacion(txtUbicacion.getText().trim());
+                libro.setCantidadTotal(Integer.parseInt(txtCantidad.getText().trim()));
+                
+                if (libroDAO.actualizar(libro)) {
+                    JOptionPane.showMessageDialog(this, "Libro actualizado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    cargarLibros();
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se pudo actualizar el libro", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void eliminarLibro() {
+     Libro libro = obtenerLibroSeleccionado();
+        
+        if (libro == null) {
+            return;
+        }
+        
+        int prestamosActivos = libro.getCantidadTotal() - libro.getCantidadDisponible();
+        
+        if (prestamosActivos > 0) {
+            JOptionPane.showMessageDialog(this,
+                "❌ NO SE PUEDE ELIMINAR\n\n" +
+                "Este libro tiene " + prestamosActivos + " préstamo(s) activo(s).",
+                "Operación No Permitida",
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        int confirmacion = JOptionPane.showConfirmDialog(this,
+            String.format("¿Eliminar este libro?\n\n📚 %s\n✍️ %s",
+                libro.getTitulo(), libro.getAutor()),
+            "⚠️ Confirmar Eliminación",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+        
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            try {
+                if (libroDAO.eliminar(libro.getIdLibro())) {
+                    System.out.println("✓ Libro eliminado");
+                    
+                    JOptionPane.showMessageDialog(this,
+                        "✓ Libro eliminado correctamente",
+                        "✓ Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    
+                    cargarLibros();
+                    jTable2.clearSelection();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                        "❌ No se pudo eliminar el libro",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                System.err.println("✗ Error: " + e.getMessage());
+                e.printStackTrace();
+                
+                JOptionPane.showMessageDialog(this,
+                    "❌ Error:\n" + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        
+        System.out.println("=== FIN DE ELIMINACIÓN ===\n");
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -179,9 +373,9 @@ private Libro obtenerLibroSeleccionado() {
         boton8 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
-        boton9 = new javax.swing.JButton();
-        boton10 = new javax.swing.JButton();
-        boton11 = new javax.swing.JButton();
+        botonnuevo1 = new javax.swing.JButton();
+        botoneditar1 = new javax.swing.JButton();
+        botonborrar1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -290,26 +484,26 @@ private Libro obtenerLibroSeleccionado() {
         jSeparator1.setForeground(new java.awt.Color(0, 102, 153));
         bg.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 113, 500, 10));
 
-        boton9.setBackground(new java.awt.Color(0, 0, 0));
-        boton9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono2.png"))); // NOI18N
-        boton9.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        boton9.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        boton9.addActionListener(this::boton9ActionPerformed);
-        bg.add(boton9, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 360, 80, 50));
+        botonnuevo1.setBackground(new java.awt.Color(0, 0, 0));
+        botonnuevo1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono2.png"))); // NOI18N
+        botonnuevo1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        botonnuevo1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        botonnuevo1.addActionListener(this::botonnuevo1ActionPerformed);
+        bg.add(botonnuevo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 360, 80, 50));
 
-        boton10.setBackground(new java.awt.Color(0, 0, 0));
-        boton10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono3_1.png"))); // NOI18N
-        boton10.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 51, 153), new java.awt.Color(0, 51, 153), new java.awt.Color(0, 51, 153), new java.awt.Color(0, 51, 153)));
-        boton10.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        boton10.addActionListener(this::boton10ActionPerformed);
-        bg.add(boton10, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 360, 80, 50));
+        botoneditar1.setBackground(new java.awt.Color(0, 0, 0));
+        botoneditar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono3_1.png"))); // NOI18N
+        botoneditar1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 51, 153), new java.awt.Color(0, 51, 153), new java.awt.Color(0, 51, 153), new java.awt.Color(0, 51, 153)));
+        botoneditar1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        botoneditar1.addActionListener(this::botoneditar1ActionPerformed);
+        bg.add(botoneditar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 360, 80, 50));
 
-        boton11.setBackground(new java.awt.Color(0, 0, 0));
-        boton11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono4_1.png"))); // NOI18N
-        boton11.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0)));
-        boton11.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        boton11.addActionListener(this::boton11ActionPerformed);
-        bg.add(boton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 360, 80, 50));
+        botonborrar1.setBackground(new java.awt.Color(0, 0, 0));
+        botonborrar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/icono4_1.png"))); // NOI18N
+        botonborrar1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0), new java.awt.Color(0, 0, 0)));
+        botonborrar1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        botonborrar1.addActionListener(this::botonborrar1ActionPerformed);
+        bg.add(botonborrar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 360, 80, 50));
 
         jLabel1.setFont(new java.awt.Font("STZhongsong", 1, 18)); // NOI18N
         jLabel1.setText("Nuevo");
@@ -357,25 +551,14 @@ private Libro obtenerLibroSeleccionado() {
 }
     }//GEN-LAST:event_jTextField1FocusLost
 
-    private void boton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton10ActionPerformed
-Libro libro = obtenerLibroSeleccionado();
+    private void botoneditar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botoneditar1ActionPerformed
+ editarLibro();     
+    }//GEN-LAST:event_botoneditar1ActionPerformed
     
-    if (libro != null) {
-        JOptionPane.showMessageDialog(this,
-            "Funcionalidad de Editar Libro\n\n" +
-            "Libro seleccionado: " + libro.getTitulo(),
-            "Editar Libro",
-            JOptionPane.INFORMATION_MESSAGE);        
-    }//GEN-LAST:event_boton10ActionPerformed
-    }
-    private void boton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton9ActionPerformed
-    JOptionPane.showMessageDialog(this,
-        "Funcionalidad de Nuevo Libro\n\n" +
-        "Aquí se abrirá un formulario para agregar un nuevo libro",
-        "Nuevo Libro",
-        JOptionPane.INFORMATION_MESSAGE);
+    private void botonnuevo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonnuevo1ActionPerformed
+     nuevoLibro();
     
-    }//GEN-LAST:event_boton9ActionPerformed
+    }//GEN-LAST:event_botonnuevo1ActionPerformed
 
     private void jTable2ComponentMoved(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jTable2ComponentMoved
         // TODO add your handling code here:
@@ -392,54 +575,20 @@ this.requestFocusInWindow();        // TODO add your handling code here:
     }//GEN-LAST:event_bgMousePressed
 
     private void jTextField1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField1KeyReleased
-     String textoBusqueda = jTextField1.getText();
-    buscarLibros(textoBusqueda);
+      buscarLibros(jTextField1.getText());
     }//GEN-LAST:event_jTextField1KeyReleased
 
-    private void boton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boton11ActionPerformed
-    Libro libro = obtenerLibroSeleccionado();
-    
-    if (libro == null) {
-        return;
-    }
-    
-    // Confirmar eliminación
-    int confirmacion = JOptionPane.showConfirmDialog(this,
-        "¿Está seguro de que desea eliminar este libro?\n\n" +
-        "Título: " + libro.getTitulo() + "\n" +
-        "Autor: " + libro.getAutor() + "\n\n" +
-        "Esta acción marcará el libro como inactivo.",
-        "Confirmar Eliminación",
-        JOptionPane.YES_NO_OPTION,
-        JOptionPane.WARNING_MESSAGE);
-    
-    if (confirmacion == JOptionPane.YES_OPTION) {
-        boolean exito = libroDAO.eliminar(libro.getIdLibro());
-        
-        if (exito) {
-            JOptionPane.showMessageDialog(this,
-                "✓ Libro eliminado correctamente",
-                "Éxito",
-                JOptionPane.INFORMATION_MESSAGE);
-            
-            // Recargar tabla
-            cargarLibros();
-        } else {
-            JOptionPane.showMessageDialog(this,
-                "Error al eliminar el libro",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    }//GEN-LAST:event_boton11ActionPerformed
+    private void botonborrar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonborrar1ActionPerformed
+       eliminarLibro();
+    }//GEN-LAST:event_botonborrar1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bg;
-    private javax.swing.JButton boton10;
-    private javax.swing.JButton boton11;
     private javax.swing.JButton boton8;
-    private javax.swing.JButton boton9;
+    private javax.swing.JButton botonborrar1;
+    private javax.swing.JButton botoneditar1;
+    private javax.swing.JButton botonnuevo1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

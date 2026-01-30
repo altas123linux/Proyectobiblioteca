@@ -198,7 +198,7 @@ public class PrestamoControl {
         LocalDate nuevaFecha = prestamo.getFechaDevolucionEsperada().plusDays(diasAdicionales);
         prestamo.setFechaDevolucionEsperada(nuevaFecha);
         
-        System.out.println("Préstamo renovado exitosamente");
+        System.out.println("Prestamo renovado exitosamente");
         System.out.println("Nueva fecha de devolución: " + nuevaFecha);
         
         return true;
@@ -235,7 +235,7 @@ public class PrestamoControl {
         int prestamosVencidos = obtenerPrestamosVencidos().size();
         int prestamosDevueltos = obtenerPrestamosDevueltos().size();
         
-        return "Total de préstamos: " + totalPrestamos + "\n" +
+        return "Total de prestamos: " + totalPrestamos + "\n" +
                "Préstamos activos: " + prestamosActivos + "\n" +
                "Préstamos vencidos: " + prestamosVencidos + "\n" +
                "Préstamos devueltos: " + prestamosDevueltos;

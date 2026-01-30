@@ -43,7 +43,7 @@ public class PrestamoDAO {
             return false;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al crear préstamo: " + e.getMessage());
+            System.err.println("Error al crear préstamo: " + e.getMessage());
             return false;
         } finally {
             try {
@@ -84,7 +84,7 @@ public Prestamo buscarPorId(int idPrestamo) {
         return null;
         
     } catch (SQLException e) {
-        System.err.println("✗ Error al buscar préstamo por ID: " + e.getMessage());
+        System.err.println("Error al buscar préstamo por ID: " + e.getMessage());
         e.printStackTrace();
         return null;
     } finally {
@@ -126,14 +126,14 @@ public boolean actualizar(Prestamo prestamo) {
         int filasAfectadas = stmt.executeUpdate();
         
         if (filasAfectadas > 0) {
-            System.out.println("✓ Préstamo actualizado: ID " + prestamo.getIdPrestamo());
+            System.out.println("Préstamo actualizado: ID " + prestamo.getIdPrestamo());
             return true;
         }
         
         return false;
         
     } catch (SQLException e) {
-        System.err.println("✗ Error al actualizar préstamo: " + e.getMessage());
+        System.err.println("Error al actualizar préstamo: " + e.getMessage());
         e.printStackTrace();
         return false;
     } finally {
@@ -174,7 +174,7 @@ public boolean actualizar(Prestamo prestamo) {
             }
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al obtener préstamos del usuario: " + e.getMessage());
+            System.err.println("Error al obtener préstamos del usuario: " + e.getMessage());
         } finally {
             try {
                 if (rs != null) rs.close();
@@ -214,10 +214,10 @@ public boolean actualizar(Prestamo prestamo) {
                 prestamos.add(crearPrestamoDesdeResultSet(rs));
             }
             
-            System.out.println("✓ Se obtuvieron " + prestamos.size() + " préstamos activos");
+            System.out.println("Se obtuvieron " + prestamos.size() + " préstamos activos");
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al obtener préstamos activos: " + e.getMessage());
+            System.err.println("Error al obtener préstamos activos: " + e.getMessage());
         } finally {
             try {
                 if (rs != null) rs.close();
@@ -260,7 +260,7 @@ public boolean actualizar(Prestamo prestamo) {
             }
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al obtener préstamos vencidos: " + e.getMessage());
+            System.err.println("Error al obtener prestamos vencidos: " + e.getMessage());
         } finally {
             try {
                 if (rs != null) rs.close();
@@ -299,10 +299,10 @@ public boolean actualizar(Prestamo prestamo) {
             prestamos.add(crearPrestamoDesdeResultSet(rs));
         }
         
-        System.out.println("✓ Se obtuvieron " + prestamos.size() + " préstamos");
+        System.out.println("Se obtuvieron " + prestamos.size() + " préstamos");
         
     } catch (SQLException e) {
-        System.err.println("✗ Error al obtener todos los préstamos: " + e.getMessage());
+        System.err.println("Error al obtener todos los préstamos: " + e.getMessage());
         e.printStackTrace();
     } finally {
         try {
@@ -335,14 +335,14 @@ public boolean actualizar(Prestamo prestamo) {
             int filasAfectadas = stmt.executeUpdate();
             
             if (filasAfectadas > 0) {
-                System.out.println("✓ Préstamo devuelto: ID " + idPrestamo);
+                System.out.println("Préstamo devuelto: ID " + idPrestamo);
                 return true;
             }
             
             return false;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al devolver libro: " + e.getMessage());
+            System.err.println("Error al devolver libro: " + e.getMessage());
             return false;
         } finally {
             try {
@@ -373,7 +373,7 @@ public boolean actualizar(Prestamo prestamo) {
             return filasAfectadas > 0;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al renovar préstamo: " + e.getMessage());
+            System.err.println("Error al renovar préstamo: " + e.getMessage());
             return false;
         } finally {
             try {

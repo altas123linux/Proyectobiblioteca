@@ -39,14 +39,14 @@ public class PersonaDAO {
             int filasAfectadas = stmt.executeUpdate();
             
             if (filasAfectadas > 0) {
-                System.out.println("✓ Usuario insertado en BD: " + usuario.getUsuario());
+                System.out.println("Usuario insertado en BD: " + usuario.getUsuario());
                 return true;
             }
             
             return false;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al insertar usuario: " + e.getMessage());
+            System.err.println("Error al insertar usuario: " + e.getMessage());
             return false;
         } finally {
             try {
@@ -82,7 +82,7 @@ public class PersonaDAO {
             return null;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al buscar usuario: " + e.getMessage());
+            System.err.println("Error al buscar usuario: " + e.getMessage());
             return null;
         } finally {
             try {
@@ -119,7 +119,7 @@ public class PersonaDAO {
             return null;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al buscar por cédula: " + e.getMessage());
+            System.err.println("Error al buscar por cédula: " + e.getMessage());
             return null;
         } finally {
             try {
@@ -156,7 +156,7 @@ public Persona buscarPorId(int idPersona) {
         return null;
         
     } catch (SQLException e) {
-        System.err.println("✗ Error al buscar persona por ID: " + e.getMessage());
+        System.err.println("Error al buscar persona por ID: " + e.getMessage());
         return null;
     } finally {
         try {
@@ -168,41 +168,24 @@ public Persona buscarPorId(int idPersona) {
         }
     }
 }
+
 /**
  * Eliminar persona (marcar como inactivo)
  */
-public boolean eliminar(int idPersona) {
-    String sql = "UPDATE personas SET activo = 0 WHERE id_persona = ?";
-    
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    
-    try {
-        conn = ConexionBD.obtenerConexion();
-        stmt = conn.prepareStatement(sql);
-        stmt.setInt(1, idPersona);
+ public boolean eliminar(int id) {
+        String sql = "DELETE FROM personas WHERE id_persona = ?";
         
-        int filasAfectadas = stmt.executeUpdate();
-        
-        if (filasAfectadas > 0) {
-            System.out.println("✓ Persona eliminada (inactiva): ID " + idPersona);
-            return true;
-        }
-        
-        return false;
-        
-    } catch (SQLException e) {
-        System.err.println("✗ Error al eliminar persona: " + e.getMessage());
-        return false;
-    } finally {
-        try {
-            if (stmt != null) stmt.close();
-            if (conn != null) conn.close();
+        try (Connection conn = ConexionBD.obtenerConexion();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, id);
+            return pstmt.executeUpdate() > 0;
+            
         } catch (SQLException e) {
-            System.err.println("Error al cerrar recursos: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
     }
-}
     /**
      * Login - Validar usuario y contraseña
      */
@@ -222,15 +205,15 @@ public boolean eliminar(int idPersona) {
             rs = stmt.executeQuery();
             
             if (rs.next()) {
-                System.out.println("✓ Login exitoso: " + nombreUsuario);
+                System.out.println("Login exitoso: " + nombreUsuario);
                 return crearPersonaDesdeResultSet(rs);
             }
             
-            System.out.println("✗ Login fallido: credenciales incorrectas");
+            System.out.println("Login fallido: credenciales incorrectas");
             return null;
             
         } catch (SQLException e) {
-            System.err.println("✗ Error en login: " + e.getMessage());
+            System.err.println("Error en login: " + e.getMessage());
             return null;
         } finally {
             try {
@@ -263,10 +246,10 @@ public boolean eliminar(int idPersona) {
                 personas.add(crearPersonaDesdeResultSet(rs));
             }
             
-            System.out.println("✓ Se obtuvieron " + personas.size() + " personas");
+            System.out.println("Se obtuvieron " + personas.size() + " personas");
             
         } catch (SQLException e) {
-            System.err.println("✗ Error al obtener personas: " + e.getMessage());
+            System.err.println("Error al obtener personas: " + e.getMessage());
         } finally {
             try {
                 if (rs != null) rs.close();
@@ -333,7 +316,7 @@ private Persona crearPersonaDesdeResultSet(ResultSet rs) throws SQLException {
         // 2. Insertar
         System.out.println("1. Insertando usuario...");
         boolean insertado = dao.insertar(usuario);
-        System.out.println("   Resultado: " + (insertado ? "ÉXITO" : "FALLO") + "\n");
+        System.out.println("   Resultado: " + (insertado ? "EXITO" : "FALLO") + "\n");
         
         // 3. Buscar por usuario
         System.out.println("2. Buscando por usuario 'testuser'...");
@@ -345,9 +328,9 @@ private Persona crearPersonaDesdeResultSet(ResultSet rs) throws SQLException {
         }
         
         // 4. Login
-        System.out.println("3. Probando login...");
+        System.out.println("3. Probando login");
         Persona logueado = dao.login("testuser", "test123");
-        System.out.println("   Login: " + (logueado != null ? "ÉXITO" : "FALLO") + "\n");
+        System.out.println("   Login: " + (logueado != null ? "EXITO" : "FALLO") + "\n");
         
         // 5. Listar todos
         System.out.println("4. Listando todos los usuarios...");
@@ -356,6 +339,6 @@ private Persona crearPersonaDesdeResultSet(ResultSet rs) throws SQLException {
             System.out.println("   - " + p.getUsuario() + " (" + p.getTipo() + ")");
         }
         
-        System.out.println("\n=== FIN DE PRUEBAS ===");
+    
     }
 }

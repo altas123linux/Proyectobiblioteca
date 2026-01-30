@@ -120,12 +120,14 @@ private void cargarLibros() {
     cmbLibros.addItem("-- Seleccione un libro --");
     
     List<Libro> libros = libroDAO.obtenerTodos();
+       int count = 0;
     for (Libro libro : libros) {
         if (libro.isActivo() && libro.getCantidadDisponible() > 0) {
             String item = libro.getIdLibro() + " - " + 
                          libro.getTitulo() + " por " + libro.getAutor() + 
                          " (Disponibles: " + libro.getCantidadDisponible() + ")";
             cmbLibros.addItem(item);
+             count++;
         }
     }
     
@@ -138,165 +140,228 @@ private void cargarLibros() {
  * Realizar un nuevo préstamo
  */
 private void realizarPrestamo() {
-    // Verificar que haya usuario logueado
-    if (usuarioLogueado == null) {
-        JOptionPane.showMessageDialog(this,
-            "⚠ No hay usuario logueado",
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    // DETERMINAR QUÉ USUARIO HARÁ EL PRÉSTAMO
-    Usuario usuarioParaPrestamo = null;
-    
-    if ("USUARIO".equalsIgnoreCase(usuarioLogueado.getTipo())) {
-        // MODO USUARIO: Prestar para sí mismo
-        usuarioParaPrestamo = (Usuario) usuarioLogueado;
-        System.out.println("📚 Préstamo para usuario: " + usuarioLogueado.getNombre());
-        
-    } else {
-        // MODO ADMIN: Usar el usuario seleccionado en ComboBox
-        if (cmbUsuarios.getSelectedIndex() <= 0) {
-            JOptionPane.showMessageDialog(this,
-                "⚠ Por favor seleccione un usuario de la lista",
-                "Usuario No Seleccionado",
-                JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        String usuarioSeleccionado = (String) cmbUsuarios.getSelectedItem();
-        
-        // Extraer ID del usuario
-        int idUsuario = -1;
-        try {
-            String[] partesUsuario = usuarioSeleccionado.split(" - ");
-            if (partesUsuario.length > 0 && !partesUsuario[0].trim().isEmpty()) {
-                idUsuario = Integer.parseInt(partesUsuario[0].trim());
+   try {
+            System.out.println("\n=== INICIANDO PROCESO DE PRÉSTAMO ===");
+            
+            // Verificar que haya usuario logueado
+            if (usuarioLogueado == null) {
+                JOptionPane.showMessageDialog(this,
+                    "No hay usuario logueado\n\n" +
+                    "Debe iniciar sesión para realizar préstamos.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
             }
+            
+            // DETERMINAR QUÉ USUARIO HARÁ EL PRÉSTAMO
+            Usuario usuarioParaPrestamo = null;
+            
+            if ("USUARIO".equalsIgnoreCase(usuarioLogueado.getTipo())) {
+                // MODO USUARIO: Prestar para sí mismo
+                usuarioParaPrestamo = (Usuario) usuarioLogueado;
+                System.out.println("Préstamo para usuario: " + usuarioLogueado.getNombre());
+                
+            } else {
+                // MODO ADMIN: Usar el usuario seleccionado en ComboBox
+                if (cmbUsuarios.getSelectedIndex() <= 0) {
+                    JOptionPane.showMessageDialog(this,
+                        "⚠ Por favor seleccione un usuario de la lista",
+                        "Usuario No Seleccionado",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+                
+                String usuarioSeleccionado = (String) cmbUsuarios.getSelectedItem();
+                
+                // Extraer ID del usuario
+                int idUsuario = -1;
+                try {
+                    String[] partesUsuario = usuarioSeleccionado.split(" - ");
+                    if (partesUsuario.length > 0 && !partesUsuario[0].trim().isEmpty()) {
+                        idUsuario = Integer.parseInt(partesUsuario[0].trim());
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this,
+                        "⚠ Error al procesar la selección del usuario",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                // Buscar el usuario
+                Persona persona = personaDAO.buscarPorId(idUsuario);
+                if (persona == null || !(persona instanceof Usuario)) {
+                    JOptionPane.showMessageDialog(this,
+                        "❌ Usuario no encontrado en la base de datos",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                usuarioParaPrestamo = (Usuario) persona;
+                System.out.println("📚 Préstamo para usuario: " + usuarioParaPrestamo.getNombre());
+            }
+            
+            // Verificar que el usuario puede pedir libros
+            if (!usuarioParaPrestamo.puedePedirLibros()) {
+                JOptionPane.showMessageDialog(this,
+                    "⚠ El usuario ha alcanzado el límite de libros prestados\n\n" +
+                    "Libros prestados: " + usuarioParaPrestamo.getLibrosPrestados() + "\n" +
+                    "Límite máximo: " + usuarioParaPrestamo.getMaxLibrosPrestamo(),
+                    "Límite Alcanzado",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            // Verificar selección de libro
+            if (cmbLibros.getSelectedIndex() <= 0) {
+                JOptionPane.showMessageDialog(this,
+                    "⚠ Por favor seleccione un libro de la lista",
+                    "Libro No Seleccionado",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            String libroSeleccionado = (String) cmbLibros.getSelectedItem();
+            
+            // Extraer ID del libro
+            int idLibro = -1;
+            try {
+                String[] partesLibro = libroSeleccionado.split(" - ");
+                if (partesLibro.length > 0 && !partesLibro[0].trim().isEmpty()) {
+                    idLibro = Integer.parseInt(partesLibro[0].trim());
+                }
+                
+                if (idLibro <= 0) {
+                    JOptionPane.showMessageDialog(this,
+                        "⚠ Por favor seleccione un libro válido",
+                        "Selección Inválida",
+                        JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                    "⚠ Error al procesar la selección del libro",
+                    "Error de Selección",
+                    JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+                return;
+            }
+            
+            System.out.println("🔍 Buscando libro con ID: " + idLibro);
+            
+            // Buscar el libro
+            Libro libro = libroDAO.buscarPorId(idLibro);
+            if (libro == null) {
+                JOptionPane.showMessageDialog(this,
+                    "❌ Libro no encontrado en la base de datos\n\n" +
+                    "ID del libro: " + idLibro,
+                    "Libro No Encontrado",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            System.out.println("✓ Libro encontrado: " + libro.getTitulo());
+            
+            // Verificar disponibilidad
+            if (libro.getCantidadDisponible() <= 0) {
+                JOptionPane.showMessageDialog(this,
+                    "⚠ Libro no disponible\n\n" +
+                    "Título: " + libro.getTitulo() + "\n" +
+                    "Autor: " + libro.getAutor() + "\n" +
+                    "Cantidad disponible: 0",
+                    "No Disponible",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            
+            System.out.println("✓ Libro disponible. Cantidad: " + libro.getCantidadDisponible());
+            
+            // Crear el préstamo
+            Prestamo prestamo = new Prestamo();
+            prestamo.setUsuario(usuarioParaPrestamo);
+            prestamo.setLibro(libro);
+            prestamo.setFechaPrestamo(LocalDate.now());
+            prestamo.setFechaDevolucionEsperada(LocalDate.now().plusDays(7)); // 7 días por defecto
+            prestamo.setEstado("ACTIVO");
+            
+            System.out.println("📝 Guardando préstamo en base de datos...");
+            
+            // Guardar en BD
+            boolean exito = prestamoDAO.insertar(prestamo);
+            
+            if (exito) {
+                System.out.println("✓ Préstamo guardado en BD");
+                
+                // Actualizar disponibilidad del libro
+                int nuevaDisponibilidad = libro.getCantidadDisponible() - 1;
+                boolean actualizado = libroDAO.actualizarDisponibilidad(idLibro, nuevaDisponibilidad);
+                
+                if (actualizado) {
+                    System.out.println("✓ Disponibilidad actualizada: " + nuevaDisponibilidad);
+                    
+                    // Mensaje de éxito
+                    JOptionPane.showMessageDialog(this,
+                        "✓ PRÉSTAMO REALIZADO EXITOSAMENTE\n\n" +
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                        "📚 LIBRO: " + libro.getTitulo() + "\n" +
+                        "   Autor: " + libro.getAutor() + "\n\n" +
+                        "👤 USUARIO: " + usuarioParaPrestamo.getNombre() + " " + 
+                                        usuarioParaPrestamo.getApellido() + "\n\n" +
+                        "📅 Fecha Préstamo: " + prestamo.getFechaPrestamo() + "\n" +
+                        "📅 Devolución: " + prestamo.getFechaDevolucionEsperada() + "\n" +
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+                        "Préstamo Exitoso",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    
+                    // Limpiar campos
+                    limpiarCampos();
+                    
+                    System.out.println("=== PRÉSTAMO COMPLETADO EXITOSAMENTE ===\n");
+                    
+                } else {
+                    System.err.println("✗ Error al actualizar disponibilidad");
+                    JOptionPane.showMessageDialog(this,
+                        "⚠ El préstamo se registró pero hubo un error al actualizar la disponibilidad del libro",
+                        "Advertencia",
+                        JOptionPane.WARNING_MESSAGE);
+                }
+                
+            } else {
+                System.err.println("✗ Error al guardar préstamo en BD");
+                JOptionPane.showMessageDialog(this,
+                    "❌ Error al realizar el préstamo\n\n" +
+                    "No se pudo guardar el préstamo en la base de datos.\n" +
+                    "Revisa la consola para más detalles.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+            
         } catch (Exception e) {
+            System.err.println("✗ Error inesperado al realizar préstamo:");
+            e.printStackTrace();
+            
             JOptionPane.showMessageDialog(this,
-                "⚠ Error al procesar la selección del usuario",
+                "❌ Error inesperado al realizar el préstamo\n\n" +
+                "Error: " + e.getMessage() + "\n\n" +
+                "Revisa la consola para más detalles.",
                 "Error",
                 JOptionPane.ERROR_MESSAGE);
-            return;
         }
-        
-        // Buscar el usuario
-        Persona persona = personaDAO.buscarPorId(idUsuario);
-        if (persona == null || !(persona instanceof Usuario)) {
-            JOptionPane.showMessageDialog(this,
-                "❌ Usuario no encontrado",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        usuarioParaPrestamo = (Usuario) persona;
-        System.out.println("📚 Préstamo para usuario: " + usuarioParaPrestamo.getNombre());
     }
-    
-    // Verificar selección de libro
-    if (cmbLibros.getSelectedIndex() <= 0) {
-        JOptionPane.showMessageDialog(this,
-            "⚠ Por favor seleccione un libro de la lista",
-            "Libro No Seleccionado",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    String libroSeleccionado = (String) cmbLibros.getSelectedItem();
-    
-    // Extraer ID del libro
-    int idLibro = -1;
-    try {
-        String[] partesLibro = libroSeleccionado.split(" - ");
-        if (partesLibro.length > 0 && !partesLibro[0].trim().isEmpty()) {
-            idLibro = Integer.parseInt(partesLibro[0].trim());
-        }
-        
-        if (idLibro <= 0) {
-            JOptionPane.showMessageDialog(this,
-                "⚠ Por favor seleccione un libro válido",
-                "Selección Inválida",
-                JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this,
-            "⚠ Error al procesar la selección",
-            "Error de Selección",
-            JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    // Buscar el libro
-    Libro libro = libroDAO.buscarPorId(idLibro);
-    if (libro == null) {
-        JOptionPane.showMessageDialog(this,
-            "❌ Libro no encontrado",
-            "Libro No Encontrado",
-            JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-    
-    // Verificar disponibilidad
-    if (libro.getCantidadDisponible() <= 0) {
-        JOptionPane.showMessageDialog(this,
-            "⚠ Libro no disponible\n\n" +
-            "Título: " + libro.getTitulo(),
-            "No Disponible",
-            JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-    
-    // Crear el préstamo
-    Prestamo prestamo = new Prestamo();
-    prestamo.setUsuario(usuarioParaPrestamo);
-    prestamo.setLibro(libro);
-    prestamo.setFechaPrestamo(LocalDate.now());
-    prestamo.setFechaDevolucionEsperada(LocalDate.now().plusDays(7));
-    prestamo.setEstado("ACTIVO");
-    
-    // Guardar en BD
-    boolean exito = prestamoDAO.insertar(prestamo);
-    
-    if (exito) {
-        // Actualizar disponibilidad
-        int nuevaDisponibilidad = libro.getCantidadDisponible() - 1;
-        libroDAO.actualizarDisponibilidad(idLibro, nuevaDisponibilidad);
-        
-        // Mensaje de éxito
-        JOptionPane.showMessageDialog(this,
-            "✓ PRÉSTAMO REALIZADO EXITOSAMENTE\n\n" +
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-            "📚 LIBRO: " + libro.getTitulo() + "\n" +
-            "   Autor: " + libro.getAutor() + "\n\n" +
-            "👤 USUARIO: " + usuarioParaPrestamo.getNombre() + " " + usuarioParaPrestamo.getApellido() + "\n\n" +
-            "📅 Fecha Préstamo: " + prestamo.getFechaPrestamo() + "\n" +
-            "📅 Devolución: " + prestamo.getFechaDevolucionEsperada() + "\n" +
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-            "Préstamo Exitoso",
-            JOptionPane.INFORMATION_MESSAGE);
-        
-        limpiarCampos();
-    } else {
-        JOptionPane.showMessageDialog(this,
-            "❌ Error al realizar el préstamo",
-            "Error",
-            JOptionPane.ERROR_MESSAGE);
-    }
-}
+
 
 /**
  * Limpiar campos del formulario
  */
 private void limpiarCampos() {
-    cmbUsuarios.setSelectedIndex(0);
-    cmbLibros.setSelectedIndex(0);
-    
-    // Recargar libros por si cambió disponibilidad
-    cargarLibros();
+     if (cmbUsuarios.isVisible()) {
+            cmbUsuarios.setSelectedIndex(0);
+        }
+        cmbLibros.setSelectedIndex(0);
+        
+        // Recargar libros por si cambió disponibilidad
+        cargarLibros();
 }
 
 

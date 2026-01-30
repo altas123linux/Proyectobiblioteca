@@ -265,7 +265,7 @@ imagen9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     if (cedula.isEmpty() || nombre.isEmpty() || apellido.isEmpty() || 
         Mail.isEmpty() || usuario.isEmpty() || contraseña.isEmpty()) {
         JOptionPane.showMessageDialog(this,
-            "⚠ Por favor complete todos los campos obligatorios",
+            "Por favor complete todos los campos obligatorios",
             "Campos Vacíos",
             JOptionPane.WARNING_MESSAGE);
         return;
@@ -274,7 +274,7 @@ imagen9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     // Validación: Cédula (10 dígitos)
     if (cedula.length() != 10 || !cedula.matches("\\d+")) {
         JOptionPane.showMessageDialog(this,
-            "⚠ La cédula debe tener exactamente 10 dígitos numéricos",
+            "La cédula debe tener exactamente 10 dígitos numéricos",
             "Cédula Inválida",
             JOptionPane.WARNING_MESSAGE);
         txtCedula.requestFocus();
@@ -284,7 +284,7 @@ imagen9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     // Validación: Mail
     if (!Mail.contains("@") || !Mail.contains(".")) {
         JOptionPane.showMessageDialog(this,
-            "⚠ Por favor ingrese un Mail válido\n(debe contener @ y un dominio)",
+            "Por favor ingrese un Mail válido\n(debe contener @ y un dominio)",
             "Mail Inválido",
             JOptionPane.WARNING_MESSAGE);
         txtMail.requestFocus();
@@ -294,7 +294,7 @@ imagen9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     // Validación: Contraseñas coinciden
     if (!contraseña.equals(confirmarContraseña)) {
         JOptionPane.showMessageDialog(this,
-            "⚠ Las contraseñas no coinciden\n\nPor favor verifique que ambas contraseñas sean iguales",
+            "Las contraseñas no coinciden\n\nPor favor verifique que ambas contraseñas sean iguales",
             "Contraseñas No Coinciden",
             JOptionPane.WARNING_MESSAGE);
         txtContraseña.setText("");
@@ -306,7 +306,7 @@ imagen9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     // Validación: Contraseña mínimo 6 caracteres
     if (contraseña.length() < 6) {
         JOptionPane.showMessageDialog(this,
-            "⚠ La contraseña debe tener al menos 6 caracteres\n\nActual: " + contraseña.length() + " caracteres",
+            "La contraseña debe tener al menos 6 caracteres\n\nActual: " + contraseña.length() + " caracteres",
             "Contraseña Muy Corta",
             JOptionPane.WARNING_MESSAGE);
         txtContraseña.requestFocus();
@@ -333,7 +333,7 @@ imagen9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     if (exito) {
         // ÉXITO
         JOptionPane.showMessageDialog(this,
-            "✓ Usuario registrado exitosamente\n\n" +
+            "Usuario registrado exitosamente\n\n" +
             "Usuario: " + usuario + "\n" +
             "Nombre: " + nombre + " " + apellido + "\n\n" +
             "Ya puede iniciar sesión en el sistema",
@@ -349,7 +349,7 @@ imagen9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     } else {
         // ERROR - Usuario o cédula duplicados
         JOptionPane.showMessageDialog(this,
-            "❌ No se pudo registrar el usuario\n\n" +
+            "No se pudo registrar el usuario\n\n" +
             "MOTIVOS POSIBLES:\n" +
             "• La cédula " + cedula + " ya está registrada\n" +
             "• El nombre de usuario '" + usuario + "' ya está en uso\n\n" +

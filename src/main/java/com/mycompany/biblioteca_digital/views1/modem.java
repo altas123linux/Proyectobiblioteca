@@ -229,7 +229,7 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     // Validar campos vacíos
     if (usuario.isEmpty() || contraseña.isEmpty()) {
         JOptionPane.showMessageDialog(this,
-            "⚠ Por favor complete todos los campos",
+            "Por favor complete todos los campos",
             "Campos Vacíos",
             JOptionPane.WARNING_MESSAGE);
         return;
@@ -243,7 +243,7 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     if (persona != null) {
         // Login exitoso
         JOptionPane.showMessageDialog(this,
-            "✓ Bienvenido " + persona.getNombre() + " " + persona.getApellido() + "\n" +
+            "Bienvenido " + persona.getNombre() + " " + persona.getApellido() + "\n" +
             "Tipo: " + persona.getTipo(),
             "Login Exitoso",
             JOptionPane.INFORMATION_MESSAGE);
@@ -257,7 +257,7 @@ imagen8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     } else {
         // Login fallido
         JOptionPane.showMessageDialog(this,
-            "✗ Usuario o contraseña incorrectos\n\n" +
+            "Usuario o contraseña incorrectos\n\n" +
             "Por favor verifique sus credenciales e intente nuevamente.",
             "Error de Autenticación",
             JOptionPane.ERROR_MESSAGE);
